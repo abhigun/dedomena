@@ -1,0 +1,22 @@
+users:
+  - user: "manimike00@manikandansubramanianoutloo.onmicrosoft.com"
+    display_name: "Mani M"
+    nick_name: "manim"
+  - user: "devops@manikandansubramanianoutloo.onmicrosoft.com"
+    display_name: "devops"
+    nick_name: "devops"
+client_tenant:
+  client_name: "clientx"
+  client_id: ""
+  client_secret: ""
+  subscription_id: ""
+  tenant_id: ""
+parent_tenant:
+  client_name: "phonepe"
+  client_id: ""
+  client_secret: ""
+  subscription_id: ""
+  tenant_id: ""
+  la_resource_group: ""
+  la_workspace: ""
+sql_administrator_login: "sqladminuser"
