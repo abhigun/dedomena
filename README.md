@@ -39,21 +39,21 @@ Create the client secret and please note down these values
 
 Add the app role `AppRoleAssignment.ReadWrite.All`. 
 
-![Creating App Assignment Role](https://github.com/PhonePe/dedomena/tree/main/screenshots/createAppAssignment.png)
+![Creating App Assignment Role](./screenshots/createAppAssignment.png)
 
 Add the role `Global administrator` to the service principal
 
-![Role Selection](https://github.com/PhonePe/dedomena/tree/main/screenshots/findingRoles.png)
+![Role Selection](./screenshots/findingRoles.png)
 
-![Global Admin](https://github.com/PhonePe/dedomena/tree/main/screenshots/globalAdmin.png)
+![Global Admin](./screenshots/globalAdmin.png)
 
-![Assign Global Admin](https://github.com/PhonePe/dedomena/tree/main/screenshots/assignAdmin.png)
+![Assign Global Admin](./screenshots/assignAdmin.png)
 
 #### Step 5
 
 Give the Service Principal owner role to the subscription.
 
-![SP Owner](https://github.com/PhonePe/dedomena/tree/main/screenshots/spOwner.png)
+![SP Owner](./screenshots/spOwner.png)
 
 > Once you have the above values, fill the same in values.yaml 
 > in the moderator client section, along with the desired user ids. 
