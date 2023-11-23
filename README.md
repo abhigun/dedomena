@@ -39,21 +39,21 @@ Create the client secret and please note down these values
 
 Add the app role `AppRoleAssignment.ReadWrite.All`. 
 
-![Creating App Assignment Role](./screenshots/createAppAssignment.png)
+![Creating App Assignment Role](docs/createAppAssignment.png)
 
 Add the role `Global administrator` to the service principal
 
-![Role Selection](./screenshots/findingRoles.png)
+![Role Selection](docs/findingRoles.png)
 
-![Global Admin](./screenshots/globalAdmin.png)
+![Global Admin](docs/globalAdmin.png)
 
-![Assign Global Admin](./screenshots/assignAdmin.png)
+![Assign Global Admin](docs/assignAdmin.png)
 
 #### Step 5
 
 Give the Service Principal owner role to the subscription.
 
-![SP Owner](./screenshots/spOwner.png)
+![SP Owner](docs/spOwner.png)
 
 > Once you have the above values, fill the same in values.yaml 
 > in the moderator client section, along with the desired user ids. 
