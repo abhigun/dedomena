@@ -83,8 +83,11 @@ Run the setup.sh once you have the required values.yaml populated by the moderat
 - Audit Logs pushed to contributors Log Analytics account.
 - Secrets managed in key vault
 
+Run the destroy.sh to destroy the resource group once the dataroom's purpose has been met.
 
-Run the destroy.sh to destroy the resource group once the dataroom's purpose has been met.  
+### Supported Environments
+
+- Debian Based Linux Distributions
 
 LICENSE
 -------
