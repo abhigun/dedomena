@@ -12,7 +12,9 @@
   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 '
 
-echo "Step 1: Pre-requesties installation"
+#!/usr/bin/env bash
+
+echo "Step 1: Pre-Reqs installation"
 sudo apt update
 sudo apt install curl -y
 sudo snap install yq
@@ -89,7 +91,7 @@ az rest --uri $uri --method PUT --skip-authorization-header --headers Authorizat
 #az rest --uri $uri --method PUT --skip-authorization-header --headers Authorization="$primaryToken" x-ms-authorization-auxiliary="$auxToken" ContentType="application/json" --body "{\"properties\": {\"storageAccountId\": \"/subscriptions/$(yq eval '.parent_tenant.subscription_id' values.yaml)/resourceGroups/$(yq eval '.parent_tenant.resource_group' values.yaml)/providers/Microsoft.Storage/storageAccounts/$(yq eval '.parent_tenant.storage_account' values.yaml)\",\"logs\": [{\"categoryGroup\": \"allLogs\",\"enabled\": true}]}}"
 
 
-echo "Step 6: Show Secrets"
+echo "Step 10: Show Credentials"
 az logout
 az login --service-principal --username $(yq eval '.client_tenant.client_id' values.yaml) --password $(yq eval '.client_tenant.client_secret' values.yaml) --tenant $(yq eval '.client_tenant.tenant_id' values.yaml)
 users=$(yq eval '.users[].nick_name' values.yaml)
