@@ -77,9 +77,12 @@ Run the setup.sh once you have the required values.yaml populated by the moderat
 - Storage Account and Containers
 - Randomized Passwords for the same
 - An ML workspace
+- Key Vault and Secret Manager
+- Azure Sentinel
 - Synapse Spark Tool
 - Audit Logs pushed to contributors Log Analytics account.
 - Secrets managed in key vault
+
 
 Run the destroy.sh to destroy the resource group once the dataroom's purpose has been met.  
 
