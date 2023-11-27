@@ -29,7 +29,7 @@ Get an Azure subscription created
 
 #### Step 2
 
-[Create a Service Principal](Create a Microsoft Entra app and service principal in the portal - Microsoft Entra | Microsoft Learn) in the customer tenant on Azure Active Directory. 
+[Create a Service Principal](https://learn.microsoft.com/en-us/entra/identity-platform/howto-create-service-principal-portal) in the customer tenant on Azure Active Directory. 
 
 #### Step 3
 
