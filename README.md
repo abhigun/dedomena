@@ -45,15 +45,27 @@ Add the role `Global administrator` to the service principal
 
 ![Role Selection](docs/findingRoles.png)
 
+Search for the corresponding `Entra ID`
+
 ![Search Entra ID](docs/searchEntraID.png)
+
+Search for the role `Global Administrator`
 
 ![Search Global Admin](docs/globalAdmin.png)
 
+Click on `Add Assignments`
+
+![Assign Global Admin](docs/assignAdmin.png)
+
+Add the required `assignment`
+
 ![Search Global Admin Assignment](docs/addAssignments.png)
+
+Select the moderator account - the moderator account you have created and make it a
+`Global Admin`
 
 ![Global Admin Assignment](docs/addGlobalAssignments.png)
 
-![Assign Global Admin](docs/assignAdmin.png)
 
 #### Step 5
 
@@ -84,7 +96,7 @@ Need to search by the app-name to find the tenant and assign the role.
 
 > Once the setup is done, if you intend to move files from/to SFTP, please follow the below
 
-[Connecting with SFTP][https://learn.microsoft.com/en-us/azure/storage/blobs/secure-file-transfer-protocol-support-how-to?tabs=azure-portal]
+[Connecting with SFTP](https://learn.microsoft.com/en-us/azure/storage/blobs/secure-file-transfer-protocol-support-how-to?tabs=azure-portal)
 
 ### How to Run
 
