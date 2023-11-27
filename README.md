@@ -45,13 +45,20 @@ Add the role `Global administrator` to the service principal
 
 ![Role Selection](docs/findingRoles.png)
 
-![Global Admin](docs/globalAdmin.png)
+![Search Entra ID](docs/searchEntraID.png)
+
+![Search Global Admin](docs/globalAdmin.png)
+
+![Search Global Admin Assignment](docs/addAssignments.png)
+
+![Global Admin Assignment](docs/addGlobalAssignments.png)
 
 ![Assign Global Admin](docs/assignAdmin.png)
 
 #### Step 5
 
-Give the Service Principal owner role to the subscription.
+Give the Service Principal owner role to the subscription. (Unconstrained). 
+Need to search by the app-name to find the tenant and assign the role. 
 
 ![SP Owner](docs/spOwner.png)
 
@@ -64,11 +71,20 @@ Give the Service Principal owner role to the subscription.
 - Create a client secret and note down the values.
 - Create a log analytics workspace on Azure
 - Give the Multitenant Service Principal role namely – Log analytics contributor access.
+
+![Add Log Analytics Assignment](docs/addLAAssignment.png)
+
 - Fill in values.yaml with the details of subscription,Service Principal and log analytics name.
 
 > Log Analytics namespace is required by the contributor to have the audit history of the actions
 > performed on the dataroom by the moderator. The intention is to audit these actions for future deliberation 
 > should there be any. 
+
+### Connecting with SFTP on Blob Storage 
+
+> Once the setup is done, if you intend to move files from/to SFTP, please follow the below
+
+[Connecting with SFTP][https://learn.microsoft.com/en-us/azure/storage/blobs/secure-file-transfer-protocol-support-how-to?tabs=azure-portal]
 
 ### How to Run
 
