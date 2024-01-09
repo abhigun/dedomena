@@ -74,6 +74,12 @@ Need to search by the app-name to find the tenant and assign the role.
 
 ![SP Owner](docs/spOwner.png)
 
+#### Step 6
+Verify and register the following resource providers to the subscription.
+`microsoft.insights`
+`Microsoft.OperationalInsights`
+![Resource Providers](docs/subscriptionInsights.png)
+
 > Once you have the above values, fill the same in values.yaml 
 > in the moderator client section, along with the desired user ids. 
 
@@ -85,6 +91,7 @@ Need to search by the app-name to find the tenant and assign the role.
 - Give the Multitenant Service Principal role namely – Log analytics contributor access.
 
 ![Add Log Analytics Assignment](docs/addLAAssignment.png)
+- Register the `microsoft.insights`,`Microsoft.OperationalInsights` resource providers for the subscription if not already 
 
 - Fill in values.yaml with the details of subscription,Service Principal and log analytics name.
 
