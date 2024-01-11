@@ -107,8 +107,14 @@ Verify and register the following resource providers to the subscription.
 
 ### How to Run
 
-Run the setup.sh once you have the required values.yaml populated by the moderator. It sets up a dataroom on an azure resource group, with the following components
+Run the setup.sh once you have the required values.yaml populated by the moderator. 
 
+> Note: While populating the user information, please note the primary domain from the `Microsoft Entra ID`. 
+> For example if the primary domain name of the account is `contoso.onmicrosoft.com`, the user email should be provided as `testuser@contoso.onmircosoft.com`. 
+
+It sets up a dataroom on an azure resource group, with the following components
+
+- Azure entra users with read/contributor access to storage containers
 - Storage Account and Containers
 - Randomized Passwords for the same
 - An ML workspace
