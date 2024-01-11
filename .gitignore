@@ -11,4 +11,6 @@ logs
 *.iml
 *.ipr
 *.iws
+/.terraform/
+.terraform.lock.hcl
 
