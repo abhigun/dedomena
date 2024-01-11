@@ -1,3 +1,4 @@
+# display_name & nick_name can only contain Alphanumerics & dashes
 users:
   - user: "<sample user email>"
     display_name: "<display name>"
