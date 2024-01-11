@@ -11,17 +11,9 @@
   distributed under the License is distributed on an "AS IS" BASIS,
   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 */
-variable "subscription_id" {}
-variable "tenant_id" {}
-variable "client_id" {}
-variable "client_secret" {}
 
 variable "name" {}
 variable "location" {}
-
-variable "users" {
-  type = map(list(string))
-}
 
 variable "storage_account_name" {}
 variable "account_tier" {}

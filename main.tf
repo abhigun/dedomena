@@ -80,9 +80,7 @@ module "storage_container" {
 
 module "storage_container_common_role_assignment" {
   source               = "./modules/services/role_assignment"
-#  count                = length(keys(var.users))
   count                = length(local.user_object_ids)
-#  principal_id         = module.ad_users.*.user_object_id[count.index]
   principal_id         = local.user_object_ids[count.index]
   role_definition_name = "Reader"
   scope                = module.storage_account.storage_account_id
@@ -91,14 +89,12 @@ module "storage_container_common_role_assignment" {
 module "storage_container_contributor_role_assignment" {
   source               = "./modules/services/role_assignment"
   count                = length(local.user_object_ids)
-#  principal_id         = module.ad_users.*.user_object_id[count.index]
   principal_id         = local.user_object_ids[count.index]
   role_definition_name = "Storage Blob Data Contributor"
   scope                = module.storage_container.*.storage_container_id[count.index]
 }
 
 locals {
-#  reverse_users_ids = reverse(module.ad_users.*.user_object_id)
   reverse_users_ids = reverse(local.user_object_ids)
 }
 
@@ -110,16 +106,9 @@ module "storage_container_reader_role_assignment" {
   scope                = module.storage_container.*.storage_container_id[count.index]
 }
 
-## ML Workspace
-#module "ml_workspace" {
-#  source   = "../modules/services/ml_workspace"
-#  name     = "demomlrap"
-#  location = "centralindia"
-#}
-
 module "storage_account_sftp" {
   source                   = "./modules/services/storage_account"
-  name                     = "demosftp" #"demousersssftp"
+  name                     = "demosftp"
   resource_group_name      = module.resource_group.resource-grp
   location                 = module.resource_group.resource-location
   account_tier             = var.account_tier
