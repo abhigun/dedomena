@@ -53,11 +53,6 @@ locals {
   user_object_ids = [for user in local.user_list : user.user_object_id]
 }
 
-#module "ad_invitation" {
-#  source  = "../modules/services/azuread_invitation"
-#  user_email_address   = "manikandan.subramanian@rapyder.com"
-#}
-
 module "storage_account" {
   source                   = "./modules/services/storage_account"
   name                     = yamldecode(file("${path.module}/values.yaml")).client_tenant.client_name
@@ -129,10 +124,8 @@ module "synapse_spark" {
   name                             = var.name
   resource_group_name              = module.resource_group.resource-grp
   location                         = module.resource_group.resource-location
-#  sql_administrator_login          = "sqladminuser"
-  sql_administrator_login         = yamldecode(file("${path.module}/values.yaml")).sql_administrator_login
+  sql_administrator_login          = yamldecode(file("${path.module}/values.yaml")).sql_administrator_login
   key_vault_id                     = module.az_kv.key_vault_id
-#  sql_administrator_login_password = "H@Sh1CoR3!"
   storage_account_id               = module.storage_account_sftp.storage_account_id
 }
 

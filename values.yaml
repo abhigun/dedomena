@@ -7,13 +7,12 @@ users:
     display_name: "<display name>"
     nick_name: "<short handed name>"
 client_tenant:
-  client_name: "<moderator_client_name>"
+  client_name: "<moderator_client_name>" # Client storage account name
   client_id: "<moderator_client_id>"
   client_secret: "<moderator_client_secret>"
   subscription_id: "<moderator_subscription_id>"
   tenant_id: "<moderator_tenant_id>"
 parent_tenant:
-  client_name: "<contributer_client_name>"
   client_id: "<contributor_client_id>"
   client_secret: "<contributor_client_secret>"
   subscription_id: "<contributor_subscription_id>"
