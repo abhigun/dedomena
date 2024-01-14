@@ -11,13 +11,9 @@
   distributed under the License is distributed on an "AS IS" BASIS,
   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 */
-resource "random_id" "saname" {
-  byte_length = 5
-  prefix = var.name
-}
 
 resource "azurerm_storage_account" "storage_account" {
-  name                     = random_id.saname.hex
+  name                     = var.name
   resource_group_name      = var.resource_group_name
   location                 = var.location
   account_tier             = var.account_tier
