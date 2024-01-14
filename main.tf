@@ -17,6 +17,7 @@ module "resource_group" {
   location = var.location
 }
 
+
 module "storage_account_sftp" {
   source                   = "./modules/services/storage_account"
   name                     = "demosftp"
@@ -34,4 +35,3 @@ module "local_user" {
   resource_name = module.resource_group.resource-grp
   storage_account_id = module.storage_account_sftp.storage_account_id
 }
-

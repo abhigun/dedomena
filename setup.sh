@@ -89,10 +89,9 @@ DiagnosticSettings=$(yq eval '.client_tenant.client_name' values.yaml)
 uri="https://management.azure.com/subscriptions/$(yq eval '.client_tenant.subscription_id' values.yaml)/providers/Microsoft.Insights/diagnosticSettings/$DiagnosticSettings?api-version=2021-05-01-preview"
 az rest --uri $uri --method PUT --skip-authorization-header --headers Authorization="$primaryToken" x-ms-authorization-auxiliary="$auxToken" ContentType="application/json" --body "{\"properties\": {\"workspaceId\": \"/subscriptions/$(yq eval '.parent_tenant.subscription_id' values.yaml)/resourceGroups/$(yq eval '.parent_tenant.la_resource_group' values.yaml)/providers/Microsoft.OperationalInsights/workspaces/$(yq eval '.parent_tenant.la_workspace' values.yaml)\",\"logs\": [{\"categoryGroup\": \"allLogs\",\"enabled\": true}]}}"
 
-echo "Fetching Storage Accounts under dataroom resource group"
-az logout
-az login --service-principal --username $(yq eval '.client_tenant.client_id' values.yaml) --password $(yq eval '.client_tenant.client_secret' values.yaml) --tenant $(yq eval '.client_tenant.tenant_id' values.yaml)
-az storage account list -g "dataroominfra-rg"
+echo "Fetching SFTP Storage Account under dataroom resource group"
+sftp_storage_account=$(terraform output sftp_storage_account | sed 's/"//g')
+echo $sftp_storage_account
 # echo "Setting up StorageBlob DiagnosticSettings"
 # storageBlobUri="https://management.azure.com/subscriptions/$(yq eval '.client_tenant.subscription_id' values.yaml)/resourceGroups/dataroominfra-rg/providers/Microsoft.Storage/storageAccounts/$(yq eval '.client_tenant.sftp_storage_account_name' values.yaml)/blobServices/default/providers/Microsoft.Insights/diagnosticSettings/storagebloblevel?api-version=2021-05-01-preview"
 # echo $storageBlobUri
