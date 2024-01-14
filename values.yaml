@@ -12,7 +12,6 @@ client_tenant:
   client_secret: "NUj8Q~3FQ-656g5Ue5S0ZrpCvF6XehWgpiK37auA"
   subscription_id: "9c686f93-6bfb-46a2-a4bd-37613f6329fd"
   tenant_id: "b2f4d240-bdd6-4082-b911-4e99786a273d"
-  sftp_storage_account_name: "demosftp"
 parent_tenant:
   client_id: "fe13ba88-eee1-4204-b983-5bc92f0c9c22"
   client_secret: "ude8Q~a69-zrTdf5~S5OTfD_GrmZ1KJ~hnrZRcg4"
