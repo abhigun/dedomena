@@ -15,3 +15,7 @@
 output "sftp_storage_account" {
   value = module.storage_account_sftp.storage_account
 }
+
+output "resource_group_name" {
+  value = module.resource_group.resource-grp
+}
