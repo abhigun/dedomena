@@ -57,13 +57,13 @@ terraform plan
 echo "Step 5: Terraform Apply"
 terraform apply --auto-approve
 
-echo "Step 6: Show Secrets"
-users=$(yq eval '.users[].nick_name' values.yaml)
-keyvault=$(terraform output users_keyvault | sed 's/"//g')
-for name in $users;
-do
-  echo "$name: $(az keyvault secret show --name $name --vault-name $keyvault  --query 'value' --output tsv)"
-done
+# echo "Step 6: Show Secrets"
+# users=$(yq eval '.users[].nick_name' values.yaml)
+# keyvault=$(terraform output users_keyvault | sed 's/"//g')
+# for name in $users;
+# do
+#   echo "$name: $(az keyvault secret show --name $name --vault-name $keyvault  --query 'value' --output tsv)"
+# done
 
 echo "Step 7: Setup Role for mutitenant APP ID"
 az login --service-principal --username $(yq eval '.client_tenant.client_id' values.yaml) --password $(yq eval '.client_tenant.client_secret' values.yaml) --tenant $(yq eval '.client_tenant.tenant_id' values.yaml)
@@ -91,19 +91,19 @@ az rest --uri $uri --method PUT --skip-authorization-header --headers Authorizat
 #az rest --uri $uri --method PUT --skip-authorization-header --headers Authorization="$primaryToken" x-ms-authorization-auxiliary="$auxToken" ContentType="application/json" --body "{\"properties\": {\"storageAccountId\": \"/subscriptions/$(yq eval '.parent_tenant.subscription_id' values.yaml)/resourceGroups/$(yq eval '.parent_tenant.resource_group' values.yaml)/providers/Microsoft.Storage/storageAccounts/$(yq eval '.parent_tenant.storage_account' values.yaml)\",\"logs\": [{\"categoryGroup\": \"allLogs\",\"enabled\": true}]}}"
 
 
-echo "Step 10: Show Credentials"
-az logout
-az login --service-principal --username $(yq eval '.client_tenant.client_id' values.yaml) --password $(yq eval '.client_tenant.client_secret' values.yaml) --tenant $(yq eval '.client_tenant.tenant_id' values.yaml)
-users=$(yq eval '.users[].nick_name' values.yaml)
-keyvault=$(terraform output users_keyvault | sed 's/"//g')
-echo "Azure Entra Users"
-for name in $users;
-do
-  echo "$name: $(az keyvault secret show --name $name --vault-name $keyvault  --query 'value' --output tsv)"
-done
-echo "SQL Users"
-sqlusers=$(yq eval '.sql_administrator_login' values.yaml)
-for name in $sqlusers;
-do
-  echo "$name: $(az keyvault secret show --name $name --vault-name $keyvault  --query 'value' --output tsv)"
-done
+# echo "Step 10: Show Credentials"
+# az logout
+# az login --service-principal --username $(yq eval '.client_tenant.client_id' values.yaml) --password $(yq eval '.client_tenant.client_secret' values.yaml) --tenant $(yq eval '.client_tenant.tenant_id' values.yaml)
+# users=$(yq eval '.users[].nick_name' values.yaml)
+# keyvault=$(terraform output users_keyvault | sed 's/"//g')
+# echo "Azure Entra Users"
+# for name in $users;
+# do
+#   echo "$name: $(az keyvault secret show --name $name --vault-name $keyvault  --query 'value' --output tsv)"
+# done
+# echo "SQL Users"
+# sqlusers=$(yq eval '.sql_administrator_login' values.yaml)
+# for name in $sqlusers;
+# do
+#   echo "$name: $(az keyvault secret show --name $name --vault-name $keyvault  --query 'value' --output tsv)"
+# done
