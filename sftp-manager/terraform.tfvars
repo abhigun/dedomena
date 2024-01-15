@@ -1,0 +1,5 @@
+resource_group_name = "dataroominfra-rg"
+container_name = "dataroominfra"
+storage_account_name = "demosftpa00bd92b11"
+storage_account_id = "/subscriptions/9c686f93-6bfb-46a2-a4bd-37613f6329fd/resourceGroups/dataroominfra-rg/providers/Microsoft.Storage/storageAccounts/demosftpa00bd92b11"
+local_user_name = "demouser"

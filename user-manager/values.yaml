@@ -1,0 +1,18 @@
+# display_name & nick_name can only contain Alphanumerics & dashes
+users:
+  - princal_name: "abhigun@abhishek128959outlook.onmicrosoft.com"
+    display_name: "Abhigun"
+    nick_name: "abhigun"
+    roles:
+      - name: <Role Name>
+        scope: <Resource scope>
+      - name: <Role Name>
+        scope: <Resource scope>
+  - princal_name: "abhishek@abhishek128959outlook.onmicrosoft.com"
+    display_name: "Abhishek"
+    nick_name: "Abhishek"
+    roles:
+      - name: <Role Name>
+        scope: <Resource scope>
+      - name: <Role Name>
+        scope: <Resource scope>    
