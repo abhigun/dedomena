@@ -49,10 +49,10 @@ module "synapse_spark" {
   storage_account_id               = module.storage_account_sftp.storage_account_id
 }
 
-# module "sentinel" {
-#   source              = "../modules/services/sentinel"
-#   resource_group_name = module.resource_group.resource-grp
-#   location            = module.resource_group.resource-location
-#   name                = var.name
-#   sku                 = "PerGB2018"
-# }
+module "sentinel" {
+  source              = "../modules/services/sentinel"
+  resource_group_name = module.resource_group.resource-grp
+  location            = module.resource_group.resource-location
+  name                = var.name
+  sku                 = "PerGB2018"
+}

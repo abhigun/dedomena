@@ -23,4 +23,11 @@ terraform plan
 echo "Step 6: Terraform Apply"
 terraform apply --auto-approve
 
-terraform output
+users=$(yq eval '.users[].nick_name' values.yaml)
+echo "Azure Entra Users"
+for name in $users;
+do
+  echo "$name: $(az keyvault secret show --name $name --vault-name azusers  --query 'value' --output tsv)"
+done
+
+az logout
