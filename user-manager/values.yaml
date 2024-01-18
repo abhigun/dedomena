@@ -1,24 +1,24 @@
 # display_name & nick_name can only contain Alphanumerics & dashes
 users:
-  - princal_name: "abhigun@abhishek128959outlook.onmicrosoft.com"
-    display_name: "Abhigun"
-    nick_name: "abhigun"
+  - user_principal_name: "<sample user email>"
+    display_name: "<display name>"
+    nick_name: "<short handed name>"
     roles:
-      - name: "Reader"
-        scope: "/subscriptions/9c686f93-6bfb-46a2-a4bd-37613f6329fd/resourceGroups/dataroominfra-rg/providers/Microsoft.Storage/storageAccounts/demosftp50def1df07"
-      - name: "Storage Blob Data Contributor"
-        scope: "/subscriptions/9c686f93-6bfb-46a2-a4bd-37613f6329fd/resourceGroups/dataroominfra-rg/providers/Microsoft.Storage/storageAccounts/demosftp50def1df07/blobServices/default/containers/sftpcontainer"
-  - princal_name: "abhishek@abhishek128959outlook.onmicrosoft.com"
-    display_name: "Abhishek"
-    nick_name: "Abhishek"
+      - name: "<Role name>" # Applicable only for azure built in roles. Check the available built in roles against the resource
+        scope: "<Resource Id>"
+      - name: "<Role name2>"
+        scope: "<Resource Id>"    
+  - user_principal_name: "<sample user email>"
+    display_name: "<display name>"
+    nick_name: "<short handed name>"
     roles:
-      - name: "Reader"
-        scope: "/subscriptions/9c686f93-6bfb-46a2-a4bd-37613f6329fd/resourceGroups/dataroominfra-rg/providers/Microsoft.Storage/storageAccounts/demosftp50def1df07"
+      - name: "<Role name>"
+        scope: "<Resource Id>"    
 client_tenant:
-  client_name: "moderator" # Client storage account name
-  client_id: "51fc34e7-af3d-4c2d-baf7-e8aa6715e97b"
-  client_secret: "NUj8Q~3FQ-656g5Ue5S0ZrpCvF6XehWgpiK37auA"
-  subscription_id: "9c686f93-6bfb-46a2-a4bd-37613f6329fd"
-  tenant_id: "b2f4d240-bdd6-4082-b911-4e99786a273d"
-key_vault_id: "/subscriptions/9c686f93-6bfb-46a2-a4bd-37613f6329fd/resourceGroups/dataroominfra-rg/providers/Microsoft.KeyVault/vaults/azusers5b94cc2aec"
+  client_name: "<moderator_client_name>" # Client storage account name
+  client_id: "<moderator_client_id>"
+  client_secret: "<moderator_client_secret>"
+  subscription_id: "<moderator_subscription_id>"
+  tenant_id: "<moderator_tenant_id>"
+key_vault_id: "<key_vault_id>"
 
