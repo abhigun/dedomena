@@ -111,23 +111,18 @@ do
   echo "$name: $(az keyvault secret show --name $name --vault-name $keyvault  --query 'value' --output tsv)"
 done
 
+terraform output -json > terraform_output.json
 echo "Populating values.yaml for sftp and user management"
 terraform_output=$(terraform output -json)
-echo $terraform_output
-resource_group_name=$(echo "$terraform_output" | jq -r .resource_group_name)
-keyvault_name=$(echo "$terraform_output" | jq -r .users_keyvault_name)
-storage_account_name=$(echo "$terraform_output" | jq -r .storage_account_sftp_name)
-storage_account_id=$(echo "$terraform_output" | jq -r .storage_account_sftp_id)
-key_vault_id=$(echo "$terraform_output" | jq -r .users_keyvault_id)
+resource_group_name=$(echo "$terraform_output" | jq -r .resource_group_name.value)
+keyvault_name=$(echo "$terraform_output" | jq -r .users_keyvault_name.value)
+storage_account_name=$(echo "$terraform_output" | jq -r .storage_account_sftp_name.value)
+storage_account_id=$(echo "$terraform_output" | jq -r .storage_account_sftp_id.value)
+key_vault_id=$(echo "$terraform_output" | jq -r .users_keyvault_id.value)
 
 
 yq eval-all \
   ".resource_group_name |= \"$resource_group_name\" | 
   .storage_account_name |= \"$storage_account_name\" | 
-  .storage_account_id |= \"$storage_account_id\" | 
-  .local_user_name |= \"$key_vault_id\"" \
+  .storage_account_id |= \"$storage_account_id\"" \
   ../sftp-manager/values.yaml -i
-
-yq eval \
-  ".key_vault_id |= \"$key_vault_id\"" \ 
-  ../user-manager/values.yaml -i

@@ -21,3 +21,5 @@ terraform plan
 
 echo "Step 6: Terraform Apply"
 terraform apply --auto-approve
+
+terraform output -json > terraform_output.json
