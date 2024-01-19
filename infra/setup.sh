@@ -18,6 +18,7 @@ echo "Step 1: Pre-Reqs installation"
 sudo apt update
 sudo apt install curl -y
 sudo snap install yq
+sudo apt-get install jq
 curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
 sudo apt-get install -y gnupg software-properties-common
 wget -O- https://apt.releases.hashicorp.com/gpg | gpg --dearmor | sudo tee /usr/share/keyrings/hashicorp-archive-keyring.gpg
@@ -102,10 +103,31 @@ az rest --uri $storageBlobUri --method PUT --skip-authorization-header --headers
 echo "Step 10: Show Credentials"
 az logout
 az login --service-principal --username $(yq eval '.client_tenant.client_id' values.yaml) --password $(yq eval '.client_tenant.client_secret' values.yaml) --tenant $(yq eval '.client_tenant.tenant_id' values.yaml)
-keyvault=$(terraform output users_keyvault | sed 's/"//g')
+keyvault=$(terraform output users_keyvault_name | sed 's/"//g')
 echo "SQL Users"
 sqlusers=$(yq eval '.sql_administrator_login' values.yaml)
 for name in $sqlusers;
 do
   echo "$name: $(az keyvault secret show --name $name --vault-name $keyvault  --query 'value' --output tsv)"
 done
+
+echo "Populating values.yaml for sftp and user management"
+terraform_output=$(terraform output -json)
+echo $terraform_output
+resource_group_name=$(echo "$terraform_output" | jq -r .resource_group_name)
+keyvault_name=$(echo "$terraform_output" | jq -r .users_keyvault_name)
+storage_account_name=$(echo "$terraform_output" | jq -r .storage_account_sftp_name)
+storage_account_id=$(echo "$terraform_output" | jq -r .storage_account_sftp_id)
+key_vault_id=$(echo "$terraform_output" | jq -r .users_keyvault_id)
+
+
+yq eval-all \
+  ".resource_group_name |= \"$resource_group_name\" | 
+  .storage_account_name |= \"$storage_account_name\" | 
+  .storage_account_id |= \"$storage_account_id\" | 
+  .local_user_name |= \"$key_vault_id\"" \
+  ../sftp-manager/values.yaml -i
+
+yq eval \
+  ".key_vault_id |= \"$key_vault_id\"" \ 
+  ../user-manager/values.yaml -i
