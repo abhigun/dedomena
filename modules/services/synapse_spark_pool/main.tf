@@ -54,6 +54,8 @@ resource "azurerm_synapse_firewall_rule" "synapsefirewall" {
 }
 
 
+
+
 resource "azurerm_synapse_spark_pool" "ssp" {
   name                 = var.name
   synapse_workspace_id = azurerm_synapse_workspace.sw.id

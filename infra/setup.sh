@@ -94,11 +94,15 @@ az rest --uri $uri --method PUT --skip-authorization-header --headers Authorizat
 echo "Fetching SFTP Storage Account and dataroom resource group"
 sftp_storage_account=$(terraform output storage_account_sftp_name | sed 's/"//g')
 dataroom_resource_group=$(terraform output resource_group_name | sed 's/"//g')
+synapse_workspace_name=$(terraform output synapase_workspace_name | sed 's/"//g')
 
 echo "Setting up StorageBlob DiagnosticSettings"
 storageBlobUri="https://management.azure.com/subscriptions/$(yq eval '.client_tenant.subscription_id' values.yaml)/resourceGroups/$dataroom_resource_group/providers/Microsoft.Storage/storageAccounts/$sftp_storage_account/blobServices/default/providers/Microsoft.Insights/diagnosticSettings/storagebloblevel?api-version=2021-05-01-preview"
 az rest --uri $storageBlobUri --method PUT --skip-authorization-header --headers Authorization="$primaryToken" x-ms-authorization-auxiliary="$auxToken" ContentType="application/json" --body "{\"properties\": {\"workspaceId\": \"/subscriptions/$(yq eval '.parent_tenant.subscription_id' values.yaml)/resourceGroups/$(yq eval '.parent_tenant.la_resource_group' values.yaml)/providers/Microsoft.OperationalInsights/workspaces/$(yq eval '.parent_tenant.la_workspace' values.yaml)\",\"logs\": [{\"category\": \"StorageRead\",\"enabled\": true}, {\"category\": \"StorageWrite\",\"enabled\": true}, {\"category\": \"StorageDelete\",\"enabled\": true}]}}"
 
+echo "Setting up synapse workspace DiagnosticSettings"
+synpaseUri="https://management.azure.com/subscriptions/$(yq eval '.client_tenant.subscription_id' values.yaml)/resourceGroups/$dataroom_resource_group/providers/Microsoft.Synapse/workspaces/$synapse_workspace_name/providers/Microsoft.Insights/diagnosticSettings/synapse?api-version=2021-05-01-preview"
+az rest --uri $uri --method PUT --skip-authorization-header --headers Authorization="$primaryToken" x-ms-authorization-auxiliary="$auxToken" ContentType="application/json" --body "{\"properties\": {\"workspaceId\": \"/subscriptions/$(yq eval '.parent_tenant.subscription_id' values.yaml)/resourceGroups/$(yq eval '.parent_tenant.la_resource_group' values.yaml)/providers/Microsoft.OperationalInsights/workspaces/$(yq eval '.parent_tenant.la_workspace' values.yaml)\",\"logs\": [{\"categoryGroup\": \"allLogs\",\"enabled\": true}]}}"
 
 echo "Step 10: Show Credentials"
 az logout
