@@ -32,10 +32,10 @@ output "resource_group_name" {
   value = module.resource_group.resource-grp
 }
 
-output "synapase_workspace_id" {
+output "synapse_workspace_id" {
   value = module.synapse_workspace.workspace_id
 }
 
-output "synapase_workspace_name" {
+output "synapse_workspace_name" {
   value = module.synapse_workspace.workspace_name
 }

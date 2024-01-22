@@ -3,6 +3,12 @@ locals {
   users = local.details.users
 }
 
+locals {
+  data_scientist_admin_role = ["Owner", "Synapse Administrator"]
+  data_scientist_contributor_role = ["Reader", "Synapse Contributor", "Storage Blob Data Contributor"]
+  data_scientist_monitor_role = ["Reader", "Synapse Monitoring User", "Storage Blob Data Reader"]
+}
+
 module "ad_users" {
   source              = "../modules/services/azuread_user"
   for_each            = { for i in local.users : i.user_principal_name => i }

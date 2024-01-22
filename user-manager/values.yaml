@@ -3,22 +3,12 @@ users:
   - user_principal_name: "<sample user email>"
     display_name: "<display name>"
     nick_name: "<short handed name>"
-    roles:
-      - name: "<Role name>" # Applicable only for azure built in roles. Check the available built in roles against the resource
-        scope: "<Resource Id>"
-      - name: "<Role name2>"
-        scope: "<Resource Id>"    
+    role: "<RoleName>"    
   - user_principal_name: "<sample user email>"
     display_name: "<display name>"
     nick_name: "<short handed name>"
-    roles:
-      - name: "<Role name>"
-        scope: "<Resource Id>"    
-client_tenant:
-  client_name: "<moderator_client_name>" # Client storage account name
-  client_id: "<moderator_client_id>"
-  client_secret: "<moderator_client_secret>"
-  subscription_id: "<moderator_subscription_id>"
-  tenant_id: "<moderator_tenant_id>"
+    role: "<RoleName>"   
 key_vault_id: "<key_vault_id>"
-
+storage_account_id: "<storage_account_id>"
+storage_container_id: "<storage_container_id>"
+synapse_workspace_id: "<synapse_workspace_id>"
