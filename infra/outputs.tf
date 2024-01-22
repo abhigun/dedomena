@@ -31,3 +31,11 @@ output "storage_account_sftp_id" {
 output "resource_group_name" {
   value = module.resource_group.resource-grp
 }
+
+output "synapase_workspace_id" {
+  value = module.synapse_workspace.workspace_id
+}
+
+output "synapase_workspace_name" {
+  value = module.synapse_workspace.workspace_name
+}
