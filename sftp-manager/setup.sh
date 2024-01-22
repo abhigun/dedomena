@@ -22,4 +22,19 @@ terraform plan
 echo "Step 6: Terraform Apply"
 terraform apply --auto-approve
 
+account_name=$(yq eval '.storage_account_name' values.yaml)
+container_name=$(yq eval '.container_name' values.yaml)
+user_name=$(yq eval '.local_user_name' values.yaml)
+echo "${account_name}.${container_name}.${user_name}@${account_name}.blob.core.windows.net"
+
+
 terraform output -json > terraform_output.json
+terraform_output=$(terraform output -json)
+storage_container_id=$(echo "$terraform_output" | jq -r .sftp_container_id.value)
+
+
+
+yq eval-all \
+  ".storage_container_id |= \"$storage_container_id\"" \
+  ../user-manager/values.yaml -i
+
