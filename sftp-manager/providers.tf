@@ -1,4 +1,4 @@
-: '
+/**
   Copyright 2023 PhonePe Private Limited
 
   Licensed under the Apache License, Version 2.0 (the "License");
@@ -10,12 +10,34 @@
   Unless required by applicable law or agreed to in writing, software
   distributed under the License is distributed on an "AS IS" BASIS,
   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-'
+*/
+terraform {
+  backend "azurerm" {
+    use_azuread_auth = true
+  }
+   required_providers {
+     azurerm = {
+        source  = "hashicorp/azurerm"
+       version = "=3.75.0"
+      }
+     azapi = {
+        source = "Azure/azapi"
+      }
+   }
+}
 
+provider "azapi" {
+}
 
-echo "Step 1: Destroy Infrastructure"
-az login --service-principal --username $(yq eval '.client_tenant.client_id' values.yaml) --password $(yq eval '.client_tenant.client_secret' values.yaml) --tenant $(yq eval '.client_tenant.tenant_id' values.yaml)
+provider "azurerm" {
+  features {
+    key_vault {
+      purge_soft_delete_on_destroy = false
+    }
+  }
 
-echo "Step 2: Destroy Resource group"
-az group delete -n dataroominfra-rg
-az group delete -n terraform
+}
+
+provider "azuread" {
+
+}

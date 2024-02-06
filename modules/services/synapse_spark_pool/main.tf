@@ -46,6 +46,16 @@ resource "azurerm_synapse_workspace" "sw" {
   }
 }
 
+resource "azurerm_synapse_firewall_rule" "synapsefirewall" {
+  name                 = "AllowAll"
+  synapse_workspace_id = azurerm_synapse_workspace.sw.id
+  start_ip_address     = "106.222.200.87"
+  end_ip_address       = "106.222.200.87"
+}
+
+
+
+
 resource "azurerm_synapse_spark_pool" "ssp" {
   name                 = var.name
   synapse_workspace_id = azurerm_synapse_workspace.sw.id

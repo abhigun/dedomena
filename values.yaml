@@ -1,11 +1,3 @@
-# display_name & nick_name can only contain Alphanumerics & dashes
-users:
-  - user: "<sample user email>"
-    display_name: "<display name>"
-    nick_name: "<short handed name>"
-  - user: "<sample user email>"
-    display_name: "<display name>"
-    nick_name: "<short handed name>"
 client_tenant:
   client_name: "<moderator_client_name>" # Client storage account name
   client_id: "<moderator_client_id>"
@@ -19,4 +11,3 @@ parent_tenant:
   tenant_id: "<contributor_tenant_id>"
   la_resource_group: "<contributor_log_analytics_resource_group>"
   la_workspace: "<contributor_log_analytics_workspace>"
-sql_administrator_login: "sqladminuser"

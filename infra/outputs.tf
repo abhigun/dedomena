@@ -11,22 +11,31 @@
   distributed under the License is distributed on an "AS IS" BASIS,
   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 */
-output "values" {
-  value = module.ad_users
-}
 
-output "users_keyvault" {
+output "users_keyvault_name" {
   value = module.az_kv.key_vault
 }
 
-output "user_object_ids" {
-  value = [for user in local.user_list : user.user_object_id]
+output "users_keyvault_id" {
+  value = module.az_kv.key_vault_id
 }
 
-output "sftp_storage_account" {
+output "storage_account_sftp_name" {
   value = module.storage_account_sftp.storage_account
+}
+
+output "storage_account_sftp_id" {
+  value = module.storage_account_sftp.storage_account_id
 }
 
 output "resource_group_name" {
   value = module.resource_group.resource-grp
+}
+
+output "synapse_workspace_id" {
+  value = module.synapse_spark.workspace_id
+}
+
+output "synapse_workspace_name" {
+  value = module.synapse_spark.workspace_name
 }
