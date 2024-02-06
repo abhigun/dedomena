@@ -22,3 +22,11 @@ output "users_keyvault" {
 output "user_object_ids" {
   value = [for user in local.user_list : user.user_object_id]
 }
+
+output "sftp_storage_account" {
+  value = module.storage_account_sftp.storage_account
+}
+
+output "resource_group_name" {
+  value = module.resource_group.resource-grp
+}
