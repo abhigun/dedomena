@@ -11,6 +11,8 @@ logs
 *.iml
 *.ipr
 *.iws
-/.terraform/
-.terraform.lock.hcl
-
+**/.terraform/
+**/.terraform.lock.hcl
+./values.yaml
+**/values.yaml
+**/terraform_output.json

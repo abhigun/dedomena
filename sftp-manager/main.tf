@@ -11,27 +11,22 @@
   distributed under the License is distributed on an "AS IS" BASIS,
   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 */
-terraform {
-  backend "azurerm" {
-    use_azuread_auth = true
-  }
-   required_providers {
-     azurerm = {
-        source  = "hashicorp/azurerm"
-       version = "=3.75.0"
-      }
-   }
+locals {
+  details = yamldecode(file("${path.module}/values.yaml"))
 }
 
-provider "azurerm" {
-  features {
-    key_vault {
-      purge_soft_delete_on_destroy = false
+# Workaround until azurerm_storage_account supports isSftpEnabled property
+# see https://github.com/hashicorp/terraform-provider-azurerm/issues/14736
+resource "azapi_update_resource" "enable_sftp" {
+  type        = "Microsoft.Storage/storageAccounts@2023-01-01"
+  resource_id = local.details.storage_account_id
+
+  body = jsonencode({
+    properties = {
+      isSftpEnabled = true
     }
-  }
-
+  })
 }
 
-provider "azuread" {
 
-}
+

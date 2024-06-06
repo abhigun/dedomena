@@ -1,0 +1,274 @@
+{
+  "user_object_ids": {
+    "sensitive": false,
+    "type": [
+      "tuple",
+      [
+        [
+          "object",
+          {
+            "email": "string",
+            "user_object_id": "string",
+            "user_principal_name": "string"
+          }
+        ],
+        [
+          "object",
+          {
+            "email": "string",
+            "user_object_id": "string",
+            "user_principal_name": "string"
+          }
+        ]
+      ]
+    ],
+    "value": [
+      {
+        "email": "deepanshu.singh@phonepe.in",
+        "user_object_id": "f8f3fe02-b6c7-4254-97ed-9298df2e2773",
+        "user_principal_name": "deepanshu.singh@phonepe.in"
+      },
+      {
+        "email": "ganesh.bhimrao@phonepe.in",
+        "user_object_id": "72a6504e-9bfd-4664-b617-ce79ba3aa769",
+        "user_principal_name": "ganesh.bhimrao@phonepe.in"
+      }
+    ]
+  },
+  "user_roles": {
+    "sensitive": false,
+    "type": [
+      "tuple",
+      [
+        [
+          "object",
+          {
+            "role_name": "string",
+            "role_scope": "string",
+            "user_object_id": "string"
+          }
+        ],
+        [
+          "object",
+          {
+            "role_name": "string",
+            "role_scope": "string",
+            "user_object_id": "string"
+          }
+        ],
+        [
+          "object",
+          {
+            "role_name": "string",
+            "role_scope": "string",
+            "user_object_id": "string"
+          }
+        ],
+        [
+          "object",
+          {
+            "role_name": "string",
+            "role_scope": "string",
+            "user_object_id": "string"
+          }
+        ],
+        [
+          "object",
+          {
+            "role_name": "string",
+            "role_scope": "string",
+            "user_object_id": "string"
+          }
+        ],
+        [
+          "object",
+          {
+            "role_name": "string",
+            "role_scope": "string",
+            "user_object_id": "string"
+          }
+        ]
+      ]
+    ],
+    "value": [
+      {
+        "role_name": "Reader",
+        "role_scope": "/subscriptions/83b6e667-d5f3-4f38-959b-4eccf3131ab1",
+        "user_object_id": "f8f3fe02-b6c7-4254-97ed-9298df2e2773"
+      },
+      {
+        "role_name": "Reader",
+        "role_scope": "/subscriptions/83b6e667-d5f3-4f38-959b-4eccf3131ab1/resourceGroups/dataroominfra-rg/providers/Microsoft.Storage/storageAccounts/demosftp35ab10bc01",
+        "user_object_id": "f8f3fe02-b6c7-4254-97ed-9298df2e2773"
+      },
+      {
+        "role_name": "Storage Blob Data Reader",
+        "role_scope": "/subscriptions/83b6e667-d5f3-4f38-959b-4eccf3131ab1/resourceGroups/dataroominfra-rg/providers/Microsoft.Storage/storageAccounts/demosftp35ab10bc01/blobServices/default/containers/demosftpcontainer",
+        "user_object_id": "f8f3fe02-b6c7-4254-97ed-9298df2e2773"
+      },
+      {
+        "role_name": "Reader",
+        "role_scope": "/subscriptions/83b6e667-d5f3-4f38-959b-4eccf3131ab1",
+        "user_object_id": "72a6504e-9bfd-4664-b617-ce79ba3aa769"
+      },
+      {
+        "role_name": "Reader",
+        "role_scope": "/subscriptions/83b6e667-d5f3-4f38-959b-4eccf3131ab1/resourceGroups/dataroominfra-rg/providers/Microsoft.Storage/storageAccounts/demosftp35ab10bc01",
+        "user_object_id": "72a6504e-9bfd-4664-b617-ce79ba3aa769"
+      },
+      {
+        "role_name": "Storage Blob Data Reader",
+        "role_scope": "/subscriptions/83b6e667-d5f3-4f38-959b-4eccf3131ab1/resourceGroups/dataroominfra-rg/providers/Microsoft.Storage/storageAccounts/demosftp35ab10bc01/blobServices/default/containers/demosftpcontainer",
+        "user_object_id": "72a6504e-9bfd-4664-b617-ce79ba3aa769"
+      }
+    ]
+  },
+  "users": {
+    "sensitive": false,
+    "type": [
+      "tuple",
+      [
+        [
+          "object",
+          {
+            "display_name": "string",
+            "nick_name": "string",
+            "roles": [
+              "tuple",
+              [
+                [
+                  "object",
+                  {
+                    "name": "string",
+                    "scope": "string"
+                  }
+                ],
+                [
+                  "object",
+                  {
+                    "name": "string",
+                    "scope": "string"
+                  }
+                ],
+                [
+                  "object",
+                  {
+                    "name": "string",
+                    "scope": "string"
+                  }
+                ]
+              ]
+            ],
+            "user_principal_name": "string"
+          }
+        ],
+        [
+          "object",
+          {
+            "display_name": "string",
+            "nick_name": "string",
+            "roles": [
+              "tuple",
+              [
+                [
+                  "object",
+                  {
+                    "name": "string",
+                    "scope": "string"
+                  }
+                ],
+                [
+                  "object",
+                  {
+                    "name": "string",
+                    "scope": "string"
+                  }
+                ],
+                [
+                  "object",
+                  {
+                    "name": "string",
+                    "scope": "string"
+                  }
+                ]
+              ]
+            ],
+            "user_principal_name": "string"
+          }
+        ]
+      ]
+    ],
+    "value": [
+      {
+        "display_name": "Deepanshu",
+        "nick_name": "deepanshu",
+        "roles": [
+          {
+            "name": "Reader",
+            "scope": "/subscriptions/83b6e667-d5f3-4f38-959b-4eccf3131ab1"
+          },
+          {
+            "name": "Reader",
+            "scope": "/subscriptions/83b6e667-d5f3-4f38-959b-4eccf3131ab1/resourceGroups/dataroominfra-rg/providers/Microsoft.Storage/storageAccounts/demosftp35ab10bc01"
+          },
+          {
+            "name": "Storage Blob Data Reader",
+            "scope": "/subscriptions/83b6e667-d5f3-4f38-959b-4eccf3131ab1/resourceGroups/dataroominfra-rg/providers/Microsoft.Storage/storageAccounts/demosftp35ab10bc01/blobServices/default/containers/demosftpcontainer"
+          }
+        ],
+        "user_principal_name": "deepanshu.singh@phonepe.in"
+      },
+      {
+        "display_name": "Ganesh",
+        "nick_name": "ganesh",
+        "roles": [
+          {
+            "name": "Reader",
+            "scope": "/subscriptions/83b6e667-d5f3-4f38-959b-4eccf3131ab1"
+          },
+          {
+            "name": "Reader",
+            "scope": "/subscriptions/83b6e667-d5f3-4f38-959b-4eccf3131ab1/resourceGroups/dataroominfra-rg/providers/Microsoft.Storage/storageAccounts/demosftp35ab10bc01"
+          },
+          {
+            "name": "Storage Blob Data Reader",
+            "scope": "/subscriptions/83b6e667-d5f3-4f38-959b-4eccf3131ab1/resourceGroups/dataroominfra-rg/providers/Microsoft.Storage/storageAccounts/demosftp35ab10bc01/blobServices/default/containers/demosftpcontainer"
+          }
+        ],
+        "user_principal_name": "ganesh.bhimrao@phonepe.in"
+      }
+    ]
+  },
+  "values": {
+    "sensitive": false,
+    "type": [
+      "object",
+      {
+        "deepanshu.singh@phonepe.in": [
+          "object",
+          {
+            "user_object_id": "string",
+            "user_principal_name": "string"
+          }
+        ],
+        "ganesh.bhimrao@phonepe.in": [
+          "object",
+          {
+            "user_object_id": "string",
+            "user_principal_name": "string"
+          }
+        ]
+      }
+    ],
+    "value": {
+      "deepanshu.singh@phonepe.in": {
+        "user_object_id": "f8f3fe02-b6c7-4254-97ed-9298df2e2773",
+        "user_principal_name": "deepanshu.singh@phonepe.in"
+      },
+      "ganesh.bhimrao@phonepe.in": {
+        "user_object_id": "72a6504e-9bfd-4664-b617-ce79ba3aa769",
+        "user_principal_name": "ganesh.bhimrao@phonepe.in"
+      }
+    }
+  }
+}

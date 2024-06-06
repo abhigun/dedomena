@@ -46,12 +46,23 @@ resource "azurerm_synapse_workspace" "sw" {
   }
 }
 
+resource "azurerm_synapse_firewall_rule" "synapsefirewall" {
+  name                 = "AllowAll"
+  synapse_workspace_id = azurerm_synapse_workspace.sw.id
+  start_ip_address     = "0.0.0.0"
+  end_ip_address       = "255.255.255.255"
+}
+
+
+
+
 resource "azurerm_synapse_spark_pool" "ssp" {
   name                 = var.name
   synapse_workspace_id = azurerm_synapse_workspace.sw.id
   node_size_family     = "MemoryOptimized"
   node_size            = "Small"
   cache_size           = 100
+  spark_version        = 3.3
 
   auto_scale {
     max_node_count = 50
@@ -78,6 +89,6 @@ EOF
   }
 
   tags = {
-    ENV = "Dev"
+    ENV = "Production"
   }
 }
