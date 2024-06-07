@@ -32,9 +32,9 @@ module "az_kv" {
 
 
 
-module "storage_account_sftp" {
+module "storage_account_first_party" {
   source                   = "../modules/services/storage_account"
-  name                     = "payusftp"
+  name                     = local.input.first_party_details.storage_account_name
   resource_group_name      = module.resource_group.resource-grp
   location                 = module.resource_group.resource-location
   account_tier             = var.account_tier
@@ -47,7 +47,31 @@ module "storage_account_sftp" {
 # see https://github.com/hashicorp/terraform-provider-azurerm/issues/14736
 resource "azapi_update_resource" "enable_sftp" {
   type        = "Microsoft.Storage/storageAccounts@2023-01-01"
-  resource_id = module.storage_account_sftp.storage_account_id
+  resource_id = module.storage_account_first_party.storage_account_id
+
+  body = jsonencode({
+    properties = {
+      isSftpEnabled = false
+    }
+  })
+}
+
+module "storage_account_partner" {
+  source                   = "../modules/services/storage_account"
+  name                     = local.input.partner_details.storage_account_name
+  resource_group_name      = module.resource_group.resource-grp
+  location                 = module.resource_group.resource-location
+  account_tier             = var.account_tier
+  account_replication_type = var.account_replication_type
+  is_hns_enabled           = true
+  sftp_enabled             = true
+}
+
+# Workaround until azurerm_storage_account supports isSftpEnabled property
+# see https://github.com/hashicorp/terraform-provider-azurerm/issues/14736
+resource "azapi_update_resource" "enable_sftp" {
+  type        = "Microsoft.Storage/storageAccounts@2023-01-01"
+  resource_id = module.storage_account_partner.storage_account_id
 
   body = jsonencode({
     properties = {
@@ -58,52 +82,16 @@ resource "azapi_update_resource" "enable_sftp" {
 
 module "first_party_container" {
  source                = "../modules/services/storage_container"
- name                  = local.input.first_party_details.container_name
- storage_account_name  = module.storage_account_sftp.storage_account
+ name                  = local.input.first_party_details.storage_container_name
+ storage_account_name  = module.storage_account_first_party.storage_account
  container_access_type = "blob"
 }
 
 module "partner_container" {
  source                = "../modules/services/storage_container"
- name                  = local.input.partner_details.container_name
- storage_account_name  = module.storage_account_sftp.storage_account
+ name                  = local.input.partner_details.storage_container_name
+ storage_account_name  = module.storage_account_partner.storage_account
  container_access_type = "blob"
-}
-
-module "first_party_local_user" {
-  source = "../modules/services/storage_account_local_user"
-  local_user = local.input.first_party_details.local_user_name
-  resource_name = module.first_party_container.storage_container_name
-  storage_account_id = module.storage_account_sftp.storage_account_id
-}
-
-module "partner_local_user" {
-  source = "../modules/services/storage_account_local_user"
-  local_user = local.input.partner_details.local_user_name
-  resource_name = module.partner_container.storage_container_name
-  storage_account_id = module.storage_account_sftp.storage_account_id
-}
-
-resource "azapi_resource_action" "first_party_password" {
-  type = "Microsoft.Storage/storageAccounts/localUsers@2023-01-01"
-  resource_id = module.first_party_local_user.id
-  action = "regeneratePassword"
-  body = jsonencode({
-  username = local.input.first_party_details.local_user_name
-  })
-
-  response_export_values = ["sshPassword"]
-}
-
-resource "azapi_resource_action" "partner_password" {
-  type = "Microsoft.Storage/storageAccounts/localUsers@2023-01-01"
-  resource_id = module.partner_local_user.id
-  action = "regeneratePassword"
-  body = jsonencode({
-  username = local.input.partner_details.local_user_name
-  })
-
-  response_export_values = ["sshPassword"]
 }
 
 
@@ -114,5 +102,5 @@ module "synapse_spark" {
   location                         = module.resource_group.resource-location
   sql_administrator_login          = yamldecode(file("${path.module}/values.yaml")).sql_administrator_login
   key_vault_id                     = module.az_kv.key_vault_id
-  storage_account_id               = module.storage_account_sftp.storage_account_id
+  storage_account_name             = var.synapse_storage_account
 }

@@ -28,9 +28,20 @@ module "kv_secret" {
   key_vault_id = var.key_vault_id
 }
 
+module "storage_account_synapse" {
+  source                   = "../storage_account"
+  name                     = var.storage_account_name
+  resource_group_name      = var.resource_group_name
+  location                 = var.location
+  account_tier             = var.account_tier
+  account_replication_type = var.account_replication_type
+  is_hns_enabled           = true
+  sftp_enabled             = true
+}
+
 resource "azurerm_storage_data_lake_gen2_filesystem" "fs" {
   name               = var.name
-  storage_account_id = var.storage_account_id
+  storage_account_id = module.storage_account_synapse.storage_account_id
 }
 
 resource "azurerm_synapse_workspace" "sw" {

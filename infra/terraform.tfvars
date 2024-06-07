@@ -16,3 +16,4 @@ location = "centralindia"
 
 account_tier             = "Standard"
 account_replication_type = "LRS"
+synapse_storage_account  = "synapse"
