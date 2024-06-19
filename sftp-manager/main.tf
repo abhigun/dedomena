@@ -13,36 +13,54 @@
 */
 locals {
   details = yamldecode(file("${path.module}/values.yaml"))
-  first_party_users = local.details.first_party_users
-  partner_users = local.details.partner_users
+  first_party_details = local.details.first_party_details
+  first_party_users = local.first_party_details.users
+  partner_details = local.details.partner_details
+  partner_users = local.partner_details.users
 }
 
 # Loop through first party users
-module "first_party_sftp_users" {
+module "first_party_private_sftp_users" {
   source = "../modules/services/storage_account_local_user"
   for_each = { for user in local.first_party_users : user => user }
-
+  storage_account_id = local.first_party_details.account_id
   local_user = each.key
-  resource_name = module.first_party_container.storage_container_name
-  storage_account_id = module.storage_account_sftp.storage_account_id
+  containers = [
+    {
+      container_name = local.first_party_details.private_container_name
+      user_access    = "rwd"
+    },
+    {
+      container_name = local.first_party_details.public_container_name
+      user_access    = "rwd"
+    }
+  ]
 }
 
 # Loop through partner users
-module "partner_sftp_users" {
+module "partner_sftp_private_users" {
   source = "../modules/services/storage_account_local_user"
   for_each = { for user in local.partner_users : user => user }
-
+  storage_account_id = local.partner_details.account_id
   local_user = each.key
-  resource_name = module.partner_container.storage_container_name
-  storage_account_id = module.storage_account_sftp.storage_account_id
+  containers = [
+    {
+      container_name = local.partner_details.private_container_name
+      user_access    = "rwd"
+    },
+    {
+      container_name = local.partner_details.public_container_name
+      user_access    = "rwd"
+    }
+  ]
 }
 
 # Generate passwords for first party users
-resource "azapi_resource_action" "first_party_passwords" {
+resource "azapi_resource_action" "first_party_private_passwords" {
   for_each = { for user in local.first_party_users : user => user }
 
   type = "Microsoft.Storage/storageAccounts/localUsers@2023-01-01"
-  resource_id = module.first_party_sftp_users[each.key].id
+  resource_id = module.first_party_private_sftp_users[each.key].id
   action = "regeneratePassword"
   body = jsonencode({
     username = each.key
@@ -52,11 +70,11 @@ resource "azapi_resource_action" "first_party_passwords" {
 }
 
 # Generate passwords for partner users
-resource "azapi_resource_action" "partner_passwords" {
+resource "azapi_resource_action" "partner_private_passwords" {
   for_each = { for user in local.partner_users : user => user }
 
   type = "Microsoft.Storage/storageAccounts/localUsers@2023-01-01"
-  resource_id = module.partner_sftp_users[each.key].id
+  resource_id = module.partner_sftp_private_users[each.key].id
   action = "regeneratePassword"
   body = jsonencode({
     username = each.key
@@ -65,42 +83,54 @@ resource "azapi_resource_action" "partner_passwords" {
   response_export_values = ["sshPassword"]
 }
 
+module "first_party_sftp_public_user" {
+  source = "../modules/services/storage_account_local_user"
+  local_user = local.first_party_details.public_user
+  storage_account_id = local.first_party_details.account_id
+  containers = [
+    {
+      container_name = local.first_party_details.public_container_name
+      user_access = "ro"
+    }
+  ]
+}
 
-# module "first_party_sftp_users" {
-#   source = "../modules/services/storage_account_local_user"
-#   local_user = local.input.first_party_details.local_user_name
-#   resource_name = module.first_party_container.storage_container_name
-#   storage_account_id = module.storage_account_sftp.storage_account_id
-# }
+module "partner_sftp_public_user" {
+  source = "../modules/services/storage_account_local_user"
+  local_user = local.partner_details.public_user
+  storage_account_id = local.partner_details.account_id
+  containers = [
+    {
+      container_name = local.partner_details.public_container_name
+      user_access = "ro"
+    }
+  ]  
+}
 
-# module "partner_sftp_users" {
-#   source = "../modules/services/storage_account_local_user"
-#   local_user = local.input.partner_details.local_user_name
-#   resource_name = module.partner_container.storage_container_name
-#   storage_account_id = module.storage_account_sftp.storage_account_id
-# }
+resource "azapi_resource_action" "first_party_public_password" {
+  type = "Microsoft.Storage/storageAccounts/localUsers@2023-01-01"
+  resource_id = module.first_party_sftp_public_user.id
+  action = "regeneratePassword"
+  body = jsonencode({
+  username = local.first_party_details.public_user
+  })
 
-# resource "azapi_resource_action" "first_party_passwords" {
-#   type = "Microsoft.Storage/storageAccounts/localUsers@2023-01-01"
-#   resource_id = module.first_party_local_user.id
-#   action = "regeneratePassword"
-#   body = jsonencode({
-#   username = local.input.first_party_details.local_user_name
-#   })
+  response_export_values = ["sshPassword"]
+}
 
-#   response_export_values = ["sshPassword"]
-# }
+resource "azapi_resource_action" "partner_public_password" {
+  type = "Microsoft.Storage/storageAccounts/localUsers@2023-01-01"
+  resource_id = module.partner_sftp_public_user.id
+  action = "regeneratePassword"
+  body = jsonencode({
+  username = local.partner_details.public_user
+  })
 
-# resource "azapi_resource_action" "partner_password" {
-#   type = "Microsoft.Storage/storageAccounts/localUsers@2023-01-01"
-#   resource_id = module.partner_local_user.id
-#   action = "regeneratePassword"
-#   body = jsonencode({
-#   username = local.input.partner_details.local_user_name
-#   })
+  response_export_values = ["sshPassword"]
+}
 
-#   response_export_values = ["sshPassword"]
-# }
+
+
 
 
 
