@@ -14,6 +14,8 @@
 
 locals {
   input = yamldecode(file("${path.module}/values.yaml"))
+  first_party_details = local.input.first_party_details
+  partner_details = local.input.partner_details
 }
 
 module "resource_group" {
@@ -34,7 +36,7 @@ module "az_kv" {
 
 module "storage_account_first_party" {
   source                   = "../modules/services/storage_account"
-  name                     = local.input.first_party_details.storage_account_name
+  name                     = local.first_party_details.storage_account_name
   resource_group_name      = module.resource_group.resource-grp
   location                 = module.resource_group.resource-location
   account_tier             = var.account_tier
@@ -45,7 +47,7 @@ module "storage_account_first_party" {
 
 # Workaround until azurerm_storage_account supports isSftpEnabled property
 # see https://github.com/hashicorp/terraform-provider-azurerm/issues/14736
-resource "azapi_update_resource" "enable_sftp" {
+resource "azapi_update_resource" "enable_first_party_sftp" {
   type        = "Microsoft.Storage/storageAccounts@2023-01-01"
   resource_id = module.storage_account_first_party.storage_account_id
 
@@ -58,7 +60,7 @@ resource "azapi_update_resource" "enable_sftp" {
 
 module "storage_account_partner" {
   source                   = "../modules/services/storage_account"
-  name                     = local.input.partner_details.storage_account_name
+  name                     = local.partner_details.storage_account_name
   resource_group_name      = module.resource_group.resource-grp
   location                 = module.resource_group.resource-location
   account_tier             = var.account_tier
@@ -69,7 +71,7 @@ module "storage_account_partner" {
 
 # Workaround until azurerm_storage_account supports isSftpEnabled property
 # see https://github.com/hashicorp/terraform-provider-azurerm/issues/14736
-resource "azapi_update_resource" "enable_sftp" {
+resource "azapi_update_resource" "enable_partner_sftp" {
   type        = "Microsoft.Storage/storageAccounts@2023-01-01"
   resource_id = module.storage_account_partner.storage_account_id
 
@@ -80,27 +82,54 @@ resource "azapi_update_resource" "enable_sftp" {
   })
 }
 
-module "first_party_container" {
+module "first_party_container_private" {
  source                = "../modules/services/storage_container"
- name                  = local.input.first_party_details.storage_container_name
+ name                  = local.first_party_details.private_container.name
  storage_account_name  = module.storage_account_first_party.storage_account
  container_access_type = "blob"
+ storage_account_id    = module.storage_account_first_party.storage_account_id
+ enable_ttl            = local.first_party_details.private_container.enable_ttl
+ ttl_days              = local.first_party_details.private_container.ttl_days
 }
 
-module "partner_container" {
+module "first_party_container_public" {
  source                = "../modules/services/storage_container"
- name                  = local.input.partner_details.storage_container_name
+ name                  = local.first_party_details.public_container.name
+ storage_account_name  = module.storage_account_first_party.storage_account
+ container_access_type = "blob"
+ storage_account_id    = module.storage_account_first_party.storage_account_id
+ enable_ttl            = local.first_party_details.public_container.enable_ttl
+ ttl_days              = local.first_party_details.public_container.ttl_days
+}
+
+module "partner_container_private" {
+ source                = "../modules/services/storage_container"
+ name                  = local.partner_details.private_container.name
  storage_account_name  = module.storage_account_partner.storage_account
  container_access_type = "blob"
+ storage_account_id    = module.storage_account_partner.storage_account_id
+ enable_ttl            = local.partner_details.private_container.enable_ttl
+ ttl_days              = local.partner_details.private_container.ttl_days
 }
 
+module "partner_container_public" {
+ source                = "../modules/services/storage_container"
+ name                  = local.partner_details.public_container.name
+ storage_account_name  = module.storage_account_partner.storage_account
+ container_access_type = "blob"
+ storage_account_id    = module.storage_account_partner.storage_account_id
+ enable_ttl            = local.partner_details.public_container.enable_ttl
+ ttl_days              = local.partner_details.public_container.ttl_days
+}
 
 module "synapse_spark" {
   source                           = "../modules/services/synapse_spark_pool"
   name                             = var.name
+  account_tier                     = var.account_tier
+  account_replication_type         = var.account_replication_type  
   resource_group_name              = module.resource_group.resource-grp
   location                         = module.resource_group.resource-location
   sql_administrator_login          = yamldecode(file("${path.module}/values.yaml")).sql_administrator_login
   key_vault_id                     = module.az_kv.key_vault_id
-  storage_account_name             = var.synapse_storage_account
+  storage_account_name             = var.synapse_storage_account_name
 }

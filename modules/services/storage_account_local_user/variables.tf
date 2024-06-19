@@ -13,4 +13,10 @@
 */
 variable "local_user" {}
 variable "storage_account_id" {}
-variable "resource_name" {}
+variable "containers" {
+  description = "List of container details. Each object should have a container name and user access level."
+  type = list(object({
+    container_name = string
+    user_access    = string
+  }))
+}

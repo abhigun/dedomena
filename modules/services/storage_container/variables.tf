@@ -13,4 +13,7 @@
 */
 variable "name" {}
 variable "storage_account_name" {}
+variable "storage_account_id" {}
 variable "container_access_type" {}
+variable "enable_ttl" {}
+variable "ttl_days" {}

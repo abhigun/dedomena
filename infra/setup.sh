@@ -40,11 +40,20 @@ clientname=$(yq eval '.client_tenant.client_name' ../values.yaml)
 export TENANT="phonepe"
 export TF_RESOURCE_GROUP="terraform"
 export TF_LOCATION="centralindia"
-export TF_STORAGE_ACCOUNT="tfstatephppayu"$clientname
+export TF_STORAGE_ACCOUNT="tfstatephpstage"$clientname
 export TF_STORAGE_CONTAINER="statecontainer"
 
 az login --service-principal --username $(yq eval '.client_tenant.client_id' ../values.yaml) --password $(yq eval '.client_tenant.client_secret' ../values.yaml) --tenant $(yq eval '.client_tenant.tenant_id' ../values.yaml)
 echo "Azure login successfull"
+
+echo "Register required resource providers for creation of storage accounts and insights"
+az provider register --namespace 'microsoft.insights'
+az provider register --namespace 'Microsoft.OperationalInsights'
+az provider register --namespace 'Microsoft.Storage'
+
+# Wait for 2 sec for registering the resource providers
+sleep 2
+
 az group create -n $TF_RESOURCE_GROUP -l $TF_LOCATION
 echo "Azure terraform resource group created"
 az storage account create -n $TF_STORAGE_ACCOUNT -g $TF_RESOURCE_GROUP -l $TF_LOCATION --sku Standard_LRS
@@ -96,13 +105,18 @@ uri="https://management.azure.com/subscriptions/$(yq eval '.client_tenant.subscr
 az rest --uri $uri --method PUT --skip-authorization-header --headers Authorization="$primaryToken" x-ms-authorization-auxiliary="$auxToken" ContentType="application/json" --body "{\"properties\": {\"workspaceId\": \"/subscriptions/$(yq eval '.parent_tenant.subscription_id' ../values.yaml)/resourceGroups/$(yq eval '.parent_tenant.la_resource_group' ../values.yaml)/providers/Microsoft.OperationalInsights/workspaces/$(yq eval '.parent_tenant.la_workspace' ../values.yaml)\",\"logs\": [{\"categoryGroup\": \"allLogs\",\"enabled\": true}]}}"
 
 echo "Fetching SFTP Storage Account and dataroom resource group"
-sftp_storage_account=$(terraform output storage_account_sftp_name | sed 's/"//g')
+first_party_account_name=$(terraform output storage_account_first_party_name | sed 's/"//g')
+partner_account_name=$(terraform output storage_account_partner_name | sed 's/"//g')
+
 dataroom_resource_group=$(terraform output resource_group_name | sed 's/"//g')
 synapse_workspace_name=$(terraform output synapse_workspace_name | sed 's/"//g')
 
-echo "Setting up StorageBlob DiagnosticSettings"
-storageBlobUri="https://management.azure.com/subscriptions/$(yq eval '.client_tenant.subscription_id' ../values.yaml)/resourceGroups/$dataroom_resource_group/providers/Microsoft.Storage/storageAccounts/$sftp_storage_account/blobServices/default/providers/Microsoft.Insights/diagnosticSettings/storagebloblevel?api-version=2021-05-01-preview"
-az rest --uri $storageBlobUri --method PUT --skip-authorization-header --headers Authorization="$primaryToken" x-ms-authorization-auxiliary="$auxToken" ContentType="application/json" --body "{\"properties\": {\"workspaceId\": \"/subscriptions/$(yq eval '.parent_tenant.subscription_id' ../values.yaml)/resourceGroups/$(yq eval '.parent_tenant.la_resource_group' ../values.yaml)/providers/Microsoft.OperationalInsights/workspaces/$(yq eval '.parent_tenant.la_workspace' ../values.yaml)\",\"logs\": [{\"category\": \"StorageRead\",\"enabled\": true}, {\"category\": \"StorageWrite\",\"enabled\": true}, {\"category\": \"StorageDelete\",\"enabled\": true}]}}"
+echo "Setting up StorageBlob DiagnosticSettings for entities"
+firstPartyStorageBlobUri="https://management.azure.com/subscriptions/$(yq eval '.client_tenant.subscription_id' ../values.yaml)/resourceGroups/$dataroom_resource_group/providers/Microsoft.Storage/storageAccounts/$first_party_account_name/blobServices/default/providers/Microsoft.Insights/diagnosticSettings/storagebloblevel?api-version=2021-05-01-preview"
+az rest --uri $firstPartyStorageBlobUri --method PUT --skip-authorization-header --headers Authorization="$primaryToken" x-ms-authorization-auxiliary="$auxToken" ContentType="application/json" --body "{\"properties\": {\"workspaceId\": \"/subscriptions/$(yq eval '.parent_tenant.subscription_id' ../values.yaml)/resourceGroups/$(yq eval '.parent_tenant.la_resource_group' ../values.yaml)/providers/Microsoft.OperationalInsights/workspaces/$(yq eval '.parent_tenant.la_workspace' ../values.yaml)\",\"logs\": [{\"category\": \"StorageRead\",\"enabled\": true}, {\"category\": \"StorageWrite\",\"enabled\": true}, {\"category\": \"StorageDelete\",\"enabled\": true}]}}"
+
+partnerStorageBlobUri="https://management.azure.com/subscriptions/$(yq eval '.client_tenant.subscription_id' ../values.yaml)/resourceGroups/$dataroom_resource_group/providers/Microsoft.Storage/storageAccounts/$partner_account_name/blobServices/default/providers/Microsoft.Insights/diagnosticSettings/storagebloblevel?api-version=2021-05-01-preview"
+az rest --uri $partnerStorageBlobUri --method PUT --skip-authorization-header --headers Authorization="$primaryToken" x-ms-authorization-auxiliary="$auxToken" ContentType="application/json" --body "{\"properties\": {\"workspaceId\": \"/subscriptions/$(yq eval '.parent_tenant.subscription_id' ../values.yaml)/resourceGroups/$(yq eval '.parent_tenant.la_resource_group' ../values.yaml)/providers/Microsoft.OperationalInsights/workspaces/$(yq eval '.parent_tenant.la_workspace' ../values.yaml)\",\"logs\": [{\"category\": \"StorageRead\",\"enabled\": true}, {\"category\": \"StorageWrite\",\"enabled\": true}, {\"category\": \"StorageDelete\",\"enabled\": true}]}}"
 
 echo "Setting up synapse workspace DiagnosticSettings"
 synapseUri="https://management.azure.com/subscriptions/$(yq eval '.client_tenant.subscription_id' ../values.yaml)/resourceGroups/$dataroom_resource_group/providers/Microsoft.Synapse/workspaces/$synapse_workspace_name/providers/Microsoft.Insights/diagnosticSettings/synapse?api-version=2021-05-01-preview"
@@ -120,24 +134,9 @@ do
 done
 
 terraform output -json > terraform_output.json
+
 echo "Populating ../values.yaml for sftp and user management"
-terraform_output=$(terraform output -json)
-resource_group_name=$(echo "$terraform_output" | jq -r .resource_group_name.value)
-keyvault_name=$(echo "$terraform_output" | jq -r .users_keyvault_name.value)
-storage_account_name=$(echo "$terraform_output" | jq -r .storage_account_sftp_name.value)
-storage_account_id=$(echo "$terraform_output" | jq -r .storage_account_sftp_id.value)
-key_vault_id=$(echo "$terraform_output" | jq -r .users_keyvault_id.value)
-synapse_workspace_id=$(echo "$terraform_output" | jq -r .synapse_workspace_id.value)
+chmod +x ./populate_values.sh
+./populate_values.sh 
 
 
-yq eval-all \
-  ".resource_group_name |= \"$resource_group_name\" | 
-  .storage_account_name |= \"$storage_account_name\" | 
-  .storage_account_id |= \"$storage_account_id\"" \
-  ../sftp-manager/values.yaml -i
-
-yq eval-all \
-  ".key_vault_id |= \"$key_vault_id\" | 
-  .synapse_workspace_id |= \"$synapse_workspace_id\" | 
-  .storage_account_id |= \"$storage_account_id\"" \
-  ../user-manager/values.yaml -i

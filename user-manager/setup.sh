@@ -9,7 +9,7 @@ clientname=$(yq eval '.client_tenant.client_name' ../values.yaml)
 export TENANT="phonepe"
 export TF_RESOURCE_GROUP="terraform"
 export TF_LOCATION="centralindia"
-export TF_STORAGE_ACCOUNT="tfstatephppayu"$clientname
+export TF_STORAGE_ACCOUNT="tfstatephpstage"$clientname
 export TF_STORAGE_CONTAINER="statecontainer"
 
 az login --service-principal --username $(yq eval '.client_tenant.client_id' ../values.yaml) --password $(yq eval '.client_tenant.client_secret' ../values.yaml) --tenant $(yq eval '.client_tenant.tenant_id' ../values.yaml)
@@ -34,3 +34,4 @@ do
 done
 
 az logout
+
