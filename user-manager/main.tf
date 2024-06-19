@@ -25,5 +25,3 @@ module "partner_ad_users" {
   name                = each.value.nick_name
   key_vault_id        = local.details.key_vault_id
 }
-
-

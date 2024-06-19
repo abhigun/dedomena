@@ -34,4 +34,3 @@ do
 done
 
 az logout
-

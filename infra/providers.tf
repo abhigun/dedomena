@@ -41,4 +41,3 @@ provider "azurerm" {
 provider "azuread" {
 
 }
-

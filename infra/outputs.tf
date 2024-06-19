@@ -76,7 +76,6 @@ output "synapse_workspace_id" {
   value = module.synapse_spark.workspace_id
 }
 
-
 output "synapse_workspace_name" {
   value = module.synapse_spark.workspace_name
 }
