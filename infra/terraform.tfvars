@@ -12,7 +12,6 @@
   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 */
 
-name     = "droominfrastg"
 location = "centralindia"
 
 account_tier             = "Standard"

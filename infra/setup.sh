@@ -68,10 +68,10 @@ echo "Step 4: Terraform init"
 terraform init -backend-config="resource_group_name=${TF_RESOURCE_GROUP}" -backend-config="storage_account_name=${TF_STORAGE_ACCOUNT}" -backend-config="container_name=${TF_STORAGE_CONTAINER}" -backend-config="key=infra.tfstate"
 
 echo "Step 5: Terraform Plan"
-terraform plan
+terraform plan -out=infraplan
 
 echo "Step 6: Terraform Apply"
-terraform apply --auto-approve
+terraform apply --auto-approve infraplan
 
 # echo "Step 6: Show Secrets"
 # users=$(yq eval '.users[].nick_name' ../values.yaml)

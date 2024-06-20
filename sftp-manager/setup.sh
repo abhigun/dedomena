@@ -23,10 +23,10 @@ echo "Step 4: Terraform init\n"
 terraform init -backend-config="resource_group_name=${TF_RESOURCE_GROUP}" -backend-config="storage_account_name=${TF_STORAGE_ACCOUNT}" -backend-config="container_name=${TF_STORAGE_CONTAINER}" -backend-config="key=sftp2.tfstate"
 
 echo "Step 5: Terraform Plan\n"
-terraform plan
+terraform plan -out=sftpplan
 
 echo "Step 6: Terraform Apply\n"
-terraform apply --auto-approve
+terraform apply --auto-approve sftpplan
 
 first_party_account_name=$(yq eval '.first_party_details.account_name' values.yaml)
 first_party_private_container_name=$(yq eval '.first_party_details.private_container_name' values.yaml)

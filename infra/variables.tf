@@ -12,7 +12,6 @@
   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 */
 
-variable "name" {}
 variable "location" {}
 
 variable "account_tier" {}

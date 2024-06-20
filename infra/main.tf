@@ -20,7 +20,7 @@ locals {
 
 module "resource_group" {
   source   = "../modules/services/resource_group"
-  name     = "${var.name}-rg"
+  name     = "${local.input.name}-rg"
   location = var.location
 }
 
@@ -124,7 +124,7 @@ module "partner_container_public" {
 
 module "synapse_spark" {
   source                           = "../modules/services/synapse_spark_pool"
-  name                             = var.name
+  name                             = local.input.name
   account_tier                     = var.account_tier
   account_replication_type         = var.account_replication_type  
   resource_group_name              = module.resource_group.resource-grp
