@@ -1,7 +1,7 @@
 # Define variables
 subscriptionId=$(yq eval '.subscription_id' ./values.yaml)
 synapseWorkspaceName=$(yq eval '.synapse_workspace_name' ./values.yaml)
-synapseStorageContainerId=$(yq eval '.synapse_storage_container' ./values.yaml)
+synapseStorageContainerId=$(yq eval '.synapse_storage_container_id' ./values.yaml)
 resourceGroupName=$(yq eval '.resource_group_name' ./values.yaml)
 
 first_party_account_id=$(yq eval '.first_party_details.account_id' ./values.yaml)

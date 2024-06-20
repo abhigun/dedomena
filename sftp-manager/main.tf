@@ -128,9 +128,3 @@ resource "azapi_resource_action" "partner_public_password" {
 
   response_export_values = ["sshPassword"]
 }
-
-
-
-
-
-

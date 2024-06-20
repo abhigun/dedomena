@@ -63,14 +63,15 @@ echo "Azure storage container created"
 az role assignment create --assignee "$ARM_CLIENT_ID" --role "Storage Blob Data Owner" --scope "/subscriptions/$(yq eval '.client_tenant.subscription_id' ../values.yaml)/resourceGroups/$TF_RESOURCE_GROUP/providers/Microsoft.Storage/storageAccounts/$TF_STORAGE_ACCOUNT"
 echo "Azure role assignment done"
 
+
 echo "Step 4: Terraform init"
 terraform init -backend-config="resource_group_name=${TF_RESOURCE_GROUP}" -backend-config="storage_account_name=${TF_STORAGE_ACCOUNT}" -backend-config="container_name=${TF_STORAGE_CONTAINER}" -backend-config="key=infra.tfstate"
 
 echo "Step 5: Terraform Plan"
-terraform plan
+terraform plan -out=infraplan
 
 echo "Step 6: Terraform Apply"
-terraform apply --auto-approve
+terraform apply --auto-approve infraplan
 
 # echo "Step 6: Show Secrets"
 # users=$(yq eval '.users[].nick_name' ../values.yaml)
@@ -138,5 +139,3 @@ terraform output -json > terraform_output.json
 echo "Populating ../values.yaml for sftp and user management"
 chmod +x ./populate_values.sh
 ./populate_values.sh 
-
-

@@ -26,4 +26,3 @@ module "partner_ad_users" {
   key_vault_id        = local.details.key_vault_id
 }
 
-
