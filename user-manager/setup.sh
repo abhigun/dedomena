@@ -25,10 +25,17 @@ terraform apply --auto-approve userplan
 
 terraform output -json > terraform_output.json
 
-users=$(yq eval '.users[].nick_name' values.yaml)
+first_party_users=$(yq eval '.first_party_details.users[].nick_name' values.yaml)
+partner_users=$(yq eval '.partner_details.users[].nick_name' values.yaml)
 keyvault=$(yq eval '.key_vault_name' values.yaml | sed 's/"//g')
-echo "Azure Entra Users"
-for name in $users;
+echo "First Party Azure Entra Users"
+for name in $first_party_users;
+do
+  echo "$name: $(az keyvault secret show --name $name --vault-name $keyvault  --query 'value' --output tsv)"
+done
+
+echo "\nPartner Azure Entra Users"
+for name in $partner_users;
 do
   echo "$name: $(az keyvault secret show --name $name --vault-name $keyvault  --query 'value' --output tsv)"
 done
