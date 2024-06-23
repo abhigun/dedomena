@@ -1,5 +1,0 @@
-resource_group_name: "<resource_group_name>"
-container_name: "<container_name>"
-storage_account_name: "<storage_account_name>"
-storage_account_id: "<storage_account_id>"
-local_user_name: "<local_user_name>"
