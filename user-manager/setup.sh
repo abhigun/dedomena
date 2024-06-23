@@ -27,10 +27,10 @@ echo "Step 4: Terraform init"
 terraform init -backend-config="resource_group_name=${TF_RESOURCE_GROUP}" -backend-config="storage_account_name=${TF_STORAGE_ACCOUNT}" -backend-config="container_name=${TF_STORAGE_CONTAINER}" -backend-config="key=usermanagers5.tfstate"
 
 echo "Step 5: Terraform Plan"
-terraform plan -out=userplan
+terraform plan -out=usertfplan
 
 echo "Step 6: Terraform Apply"
-terraform apply --auto-approve userplan
+terraform apply --auto-approve usertfplan
 
 terraform output -json > terraform_output.json
 

@@ -74,10 +74,10 @@ echo "Step 4: Terraform init"
 terraform init -backend-config="resource_group_name=${TF_RESOURCE_GROUP}" -backend-config="storage_account_name=${TF_STORAGE_ACCOUNT}" -backend-config="container_name=${TF_STORAGE_CONTAINER}" -backend-config="key=infra.tfstate"
 
 echo "Step 5: Terraform Plan"
-terraform plan -out=infraplan
+terraform plan -out=infratfplan
 
 echo "Step 6: Terraform Apply"
-terraform apply --auto-approve infraplan
+terraform apply --auto-approve infratfplan
 
 echo "Step 7: Setup Role for mutitenant APP ID"
 az login --service-principal --username $(yq eval '.client_tenant.client_id' "$ROOT_VALUES") --password $(yq eval '.client_tenant.client_secret' "$ROOT_VALUES") --tenant $(yq eval '.client_tenant.tenant_id' "$ROOT_VALUES")
