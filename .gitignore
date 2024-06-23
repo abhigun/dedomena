@@ -16,4 +16,3 @@ logs
 ./values.yaml
 **/values.yaml
 **/terraform_output.json
-**/*tfplan
