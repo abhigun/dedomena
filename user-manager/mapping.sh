@@ -1,16 +1,23 @@
+#!/bin/bash
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# Get the values from the relative path
+ROOT_VALUES="$SCRIPT_DIR/../values.yaml"
+LOCAL_VALUES="$SCRIPT_DIR/values.yaml"
+
 # Define variables
-subscriptionId=$(yq eval '.subscription_id' ./values.yaml)
-synapseWorkspaceName=$(yq eval '.synapse_workspace_name' ./values.yaml)
-synapseStorageContainerId=$(yq eval '.synapse_storage_container_id' ./values.yaml)
-resourceGroupName=$(yq eval '.resource_group_name' ./values.yaml)
+subscriptionId=$(yq eval '.subscription_id' "$LOCAL_VALUES")
+synapseWorkspaceName=$(yq eval '.synapse_workspace_name' "$LOCAL_VALUES")
+synapseStorageContainerId=$(yq eval '.synapse_storage_container_id' "$LOCAL_VALUES")
+resourceGroupName=$(yq eval '.resource_group_name' "$LOCAL_VALUES")
 
-first_party_account_id=$(yq eval '.first_party_details.account_id' ./values.yaml)
-first_party_public_container_id=$(yq eval '.first_party_details.public_container_id' ./values.yaml)
-first_party_private_container_id=$(yq eval '.first_party_details.private_container_id' ./values.yaml)
+first_party_account_id=$(yq eval '.first_party_details.account_id' "$LOCAL_VALUES")
+first_party_public_container_id=$(yq eval '.first_party_details.public_container_id' "$LOCAL_VALUES")
+first_party_private_container_id=$(yq eval '.first_party_details.private_container_id' "$LOCAL_VALUES")
 
-partner_account_id=$(yq eval '.partner_details.account_id' ./values.yaml)
-partner_public_container_id=$(yq eval '.partner_details.public_container_id' ./values.yaml)
-partner_private_container_id=$(yq eval '.partner_details.first_party_private_container_id' ./values.yaml)
+partner_account_id=$(yq eval '.partner_details.account_id' "$LOCAL_VALUES")
+partner_public_container_id=$(yq eval '.partner_details.public_container_id' "$LOCAL_VALUES")
+partner_private_container_id=$(yq eval '.partner_details.first_party_private_container_id' "$LOCAL_VALUES")
 
 
 terraform_output=$(cat terraform_output.json)
@@ -21,7 +28,7 @@ partner_users=($(echo "$terraform_output" | jq -r '.partner_ad_users.value[] | .
 allUsers=("${first_party_users[@]}" "${partner_users[@]}")
 
 # Azure login
-az login --service-principal --username $(yq eval '.client_tenant.client_id' ../values.yaml) --password $(yq eval '.client_tenant.client_secret' ../values.yaml) --tenant $(yq eval '.client_tenant.tenant_id' ../values.yaml)
+az login --service-principal --username $(yq eval '.client_tenant.client_id' "$ROOT_VALUES") --password $(yq eval '.client_tenant.client_secret' "$ROOT_VALUES") --tenant $(yq eval '.client_tenant.tenant_id' "$ROOT_VALUES")
 
 # Assign Reader role at the subscription level to all users
 for userObjectId in "${allUsers[@]}"; do

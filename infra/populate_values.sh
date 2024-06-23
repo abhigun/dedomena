@@ -1,9 +1,15 @@
 #!/bin/bash
 
 terraform_output=$(cat terraform_output.json)
+# script directory
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-subscriptionId="$(yq eval '.client_tenant.subscription_id' ../values.yaml)"
-dataroom_name="$(yq eval '.name' ./values.yaml)"
+# Get the values from the relative path
+ROOT_VALUES="$SCRIPT_DIR/../values.yaml"
+LOCAL_VALUES="$SCRIPT_DIR/values.yaml"
+
+subscriptionId="$(yq eval '.client_tenant.subscription_id' "$ROOT_VALUES")"
+dataroom_name="$(yq eval '.name' "$LOCAL_VALUES")"
 
 resource_group_name=$(echo "$terraform_output" | jq -r .resource_group_name.value)
 key_vault_name=$(echo "$terraform_output" | jq -r .users_keyvault_name.value)
