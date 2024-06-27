@@ -51,13 +51,13 @@ done
 
 echo "Assign Storage Blob Contributor role to respective users"
 for containerId in "$first_party_public_container_id" "$first_party_private_container_id"; do
-    for userObjectId in "${firstPartyUsers[@]}"; do
+    for userObjectId in "${first_party_users[@]}"; do
         az role assignment create --role "Storage Blob Data Contributor" --assignee-object-id $userObjectId --scope $containerId
     done
 done
 
 for containerId in "$partner_public_container_id" "$partner_private_container_id"; do
-    for userObjectId in "${partnerUsers[@]}"; do
+    for userObjectId in "${partner_users[@]}"; do
         az role assignment create --role "Storage Blob Data Contributor" --assignee-object-id $userObjectId --scope $containerId
     done
 done
