@@ -22,7 +22,7 @@ resource "azurerm_storage_management_policy" "policy" {
   storage_account_id = var.storage_account_id
 
   rule {
-    name    = "delete-data"
+    name    = "${var.name}-delete-data"
     enabled = true
     filters {
       prefix_match = ["${var.name}/"]
