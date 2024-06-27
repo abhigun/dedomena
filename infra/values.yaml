@@ -1,2 +1,22 @@
-sql_administrator_login: "<sqladminuser>"
-name: "<envName>"
+sql_administrator_login: "sqladminuser"
+first_party_details:
+  storage_account_name: "phonepestg"
+  private_container:
+    name: "phonepeprivate"
+    enable_ttl: true
+    ttl_days: 7
+  public_container:
+    name: "phonepepublic"
+    enable_ttl: true
+    ttl_days: 7
+partner_details:
+  storage_account_name: "hdfcstg"
+  private_container:
+    name: "hdfcprivate"
+    enable_ttl: true
+    ttl_days: 7
+  public_container:
+    name: "hdfcpublic"
+    enable_ttl: true
+    ttl_days: 7
+name: "droomstgtest"

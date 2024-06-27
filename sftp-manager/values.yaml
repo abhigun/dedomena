@@ -1,5 +1,19 @@
-resource_group_name: "<resource_group_name>"
-container_name: "<container_name>"
-storage_account_name: "<storage_account_name>"
-storage_account_id: "<storage_account_id>"
-local_user_name: "<local_user_name>"
+resource_group_name: "droomstgtest-rg"
+key_vault_id: "/subscriptions/74465780-0fd2-4be4-becd-dd6627b577ca/resourceGroups/droomstgtest-rg/providers/Microsoft.KeyVault/vaults/azusersce77add967"
+key_vault_name: "azusersce77add967"
+first_party_details:
+  account_name: "phonepestg078634f7ad"
+  account_id: "/subscriptions/74465780-0fd2-4be4-becd-dd6627b577ca/resourceGroups/droomstgtest-rg/providers/Microsoft.Storage/storageAccounts/phonepestg078634f7ad"
+  private_container_name: "phonepeprivate"
+  public_container_name: "phonepepublic"
+  users:
+    - "abhishek"
+  public_user: "phonepero"
+partner_details:
+  account_name: "hdfcstg42e8ba1d7a"
+  account_id: "/subscriptions/74465780-0fd2-4be4-becd-dd6627b577ca/resourceGroups/droomstgtest-rg/providers/Microsoft.Storage/storageAccounts/hdfcstg42e8ba1d7a"
+  private_container_name: "hdfcprivate"
+  public_container_name: "hdfcpublic"
+  users:
+    - "venkatesh"
+  public_user: "hdfcro"

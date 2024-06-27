@@ -1,13 +1,13 @@
 client_tenant:
-  client_name: "<moderator_client_name>" # Client storage account name
-  client_id: "<moderator_client_id>"
-  client_secret: "<moderator_client_secret>"
-  subscription_id: "<moderator_subscription_id>"
-  tenant_id: "<moderator_tenant_id>"
+  client_name: "stagetest" # Client storage account name
+  client_id: "a0fc7830-2548-4a2d-83e7-943bf3923ca7"
+  client_secret: "r0x8Q~ftwCkojP26-y_15Y.2d.tAkPlIW3q2RaRe"
+  subscription_id: "74465780-0fd2-4be4-becd-dd6627b577ca"
+  tenant_id: "c0fbb5f7-d576-41b3-84df-2b0ba7c24f37"
 parent_tenant:
-  client_id: "<contributor_client_id>"
-  client_secret: "<contributor_client_secret>"
-  subscription_id: "<contributor_subscription_id>"
-  tenant_id: "<contributor_tenant_id>"
-  la_resource_group: "<contributor_log_analytics_resource_group>"
-  la_workspace: "<contributor_log_analytics_workspace>"
+  client_id: "93a06410-2989-4bd9-9831-cfa9b8e55197"
+  client_secret: " RtZ8Q~9JQBUh3INoNsx7akd~~ubSEWpjkiImtb6o"
+  subscription_id: "c0877d44-cb90-4faf-b116-fe275ed2e9cb"
+  tenant_id: "c0fbb5f7-d576-41b3-84df-2b0ba7c24f37"
+  la_resource_group: "contributor-rg"
+  la_workspace: "stg-contributor-LAS"
