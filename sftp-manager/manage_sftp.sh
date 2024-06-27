@@ -87,13 +87,13 @@ update_sftp_schedule() {
 	# If no existing job found, enable SFTP
 	if [ -z "$job_number" ]; then
 		echo "No existing job found for $storage_account, enabling SFTP..."
-		enable_sftp $storage_account
 	else
 		# Remove the existing job if found
 		atrm $job_number
 		echo "Removed existing job number: $job_number"
 	fi
 
+	enable_sftp $storage_account
 	# Schedule the disable task based on TTL
 	schedule_disable_sftp_task $ttl_days $storage_account
 }
