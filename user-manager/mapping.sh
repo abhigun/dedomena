@@ -17,7 +17,7 @@ first_party_private_container_id=$(yq eval '.first_party_details.private_contain
 
 partner_account_id=$(yq eval '.partner_details.account_id' "$LOCAL_VALUES")
 partner_public_container_id=$(yq eval '.partner_details.public_container_id' "$LOCAL_VALUES")
-partner_private_container_id=$(yq eval '.partner_details.first_party_private_container_id' "$LOCAL_VALUES")
+partner_private_container_id=$(yq eval '.partner_details.private_container_id' "$LOCAL_VALUES")
 
 
 terraform_output=$(cat terraform_output.json)
@@ -51,7 +51,7 @@ done
 
 #Assign Storage Blob Contributor role to respective users 
 for containerId in "$first_party_public_container_id" "$first_party_private_container_id"; do
-    for userObjectId in "${firstPartyUsers[@]}"; do
+    for userObjectId in "${first_party_users[@]}"; do
         az role assignment create --role "Storage Blob Data Contributor" --assignee-object-id $userObjectId --scope $containerId
     done
 done
