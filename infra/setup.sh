@@ -101,7 +101,22 @@ echo $auxToken
 echo "Step 9: Send Logs"
 DiagnosticSettings=$(yq eval '.client_tenant.client_name' "$ROOT_VALUES")
 uri="https://management.azure.com/subscriptions/$(yq eval '.client_tenant.subscription_id' "$ROOT_VALUES")/providers/Microsoft.Insights/diagnosticSettings/$DiagnosticSettings?api-version=2021-05-01-preview"
-az rest --uri $uri --method PUT --skip-authorization-header --headers Authorization="$primaryToken" x-ms-authorization-auxiliary="$auxToken" ContentType="application/json" --body "{\"properties\": {\"workspaceId\": \"/subscriptions/$(yq eval '.parent_tenant.subscription_id' "$ROOT_VALUES")/resourceGroups/$(yq eval '.parent_tenant.la_resource_group' "$ROOT_VALUES")/providers/Microsoft.OperationalInsights/workspaces/$(yq eval '.parent_tenant.la_workspace' "$ROOT_VALUES")\",\"logs\": [{\"categoryGroup\": \"allLogs\",\"enabled\": true}]}}"
+az rest --uri $uri \
+        --method PUT \
+        --skip-authorization-header \
+        --headers Authorization="$primaryToken" x-ms-authorization-auxiliary="$auxToken" ContentType="application/json" \
+        --body '{
+            "properties": {
+                "workspaceId": "/subscriptions/$(yq eval '.parent_tenant.subscription_id' "$ROOT_VALUES")/resourceGroups/$(yq eval '.parent_tenant.la_resource_group' "$ROOT_VALUES")/providers/Microsoft.OperationalInsights/workspaces/$(yq eval '.parent_tenant.la_workspace' "$ROOT_VALUES")",
+                "logs": [
+                    {
+                        "categoryGroup": "allLogs",
+                        "enabled": true
+                    }
+                ]
+            }
+        }'
+
 
 echo "Fetching SFTP Storage Account and dataroom resource group"
 first_party_account_name=$(terraform output storage_account_first_party_name | sed 's/"//g')
@@ -112,14 +127,82 @@ synapse_workspace_name=$(terraform output synapse_workspace_name | sed 's/"//g')
 
 echo "Setting up StorageBlob DiagnosticSettings for entities"
 firstPartyStorageBlobUri="https://management.azure.com/subscriptions/$(yq eval '.client_tenant.subscription_id' "$ROOT_VALUES")/resourceGroups/$dataroom_resource_group/providers/Microsoft.Storage/storageAccounts/$first_party_account_name/blobServices/default/providers/Microsoft.Insights/diagnosticSettings/storagebloblevel?api-version=2021-05-01-preview"
-az rest --uri $firstPartyStorageBlobUri --method PUT --skip-authorization-header --headers Authorization="$primaryToken" x-ms-authorization-auxiliary="$auxToken" ContentType="application/json" --body "{\"properties\": {\"workspaceId\": \"/subscriptions/$(yq eval '.parent_tenant.subscription_id' "$ROOT_VALUES")/resourceGroups/$(yq eval '.parent_tenant.la_resource_group' "$ROOT_VALUES")/providers/Microsoft.OperationalInsights/workspaces/$(yq eval '.parent_tenant.la_workspace' "$ROOT_VALUES")\",\"logs\": [{\"category\": \"StorageRead\",\"enabled\": true}, {\"category\": \"StorageWrite\",\"enabled\": true}, {\"category\": \"StorageDelete\",\"enabled\": true}]}}"
+az rest --uri $firstPartyStorageBlobUri \
+        --method PUT \
+        --skip-authorization-header \
+        --headers Authorization="$primaryToken" x-ms-authorization-auxiliary="$auxToken" ContentType="application/json" \
+        --body '{
+            "properties": {
+                "workspaceId": "/subscriptions/$(yq eval '.parent_tenant.subscription_id' "$ROOT_VALUES")/resourceGroups/$(yq eval '.parent_tenant.la_resource_group' "$ROOT_VALUES")/providers/Microsoft.OperationalInsights/workspaces/$(yq eval '.parent_tenant.la_workspace' "$ROOT_VALUES")",
+                "storageAccountId": "/subscriptions/$(yq eval '.parent_tenant.subscription_id' "$ROOT_VALUES")/resourceGroups/$(yq eval '.parent_tenant.la_resource_group' "$ROOT_VALUES")/providers/Microsoft.Storage/storageAccounts/$(yq eval '.parent_tenant.la_storage_account' "$ROOT_VALUES")"
+                "logs": [
+                    {
+                        "category": "StorageRead",
+                        "enabled": true
+                    },
+                    {
+                        "category": "StorageWrite",
+                        "enabled": true
+                    },
+                    {
+                        "category": "StorageDelete",
+                        "enabled": true
+                    },
+                    {
+                        "categoryGroup": "allLogs",
+                        "enabled": true
+                    }
+                ]
+            }
+        }'
 
 partnerStorageBlobUri="https://management.azure.com/subscriptions/$(yq eval '.client_tenant.subscription_id' "$ROOT_VALUES")/resourceGroups/$dataroom_resource_group/providers/Microsoft.Storage/storageAccounts/$partner_account_name/blobServices/default/providers/Microsoft.Insights/diagnosticSettings/storagebloblevel?api-version=2021-05-01-preview"
-az rest --uri $partnerStorageBlobUri --method PUT --skip-authorization-header --headers Authorization="$primaryToken" x-ms-authorization-auxiliary="$auxToken" ContentType="application/json" --body "{\"properties\": {\"workspaceId\": \"/subscriptions/$(yq eval '.parent_tenant.subscription_id' "$ROOT_VALUES")/resourceGroups/$(yq eval '.parent_tenant.la_resource_group' "$ROOT_VALUES")/providers/Microsoft.OperationalInsights/workspaces/$(yq eval '.parent_tenant.la_workspace' "$ROOT_VALUES")\",\"logs\": [{\"category\": \"StorageRead\",\"enabled\": true}, {\"category\": \"StorageWrite\",\"enabled\": true}, {\"category\": \"StorageDelete\",\"enabled\": true}]}}"
-
+az rest --uri $partnerStorageBlobUri \
+        --method PUT \
+        --skip-authorization-header \
+        --headers Authorization="$primaryToken" x-ms-authorization-auxiliary="$auxToken" ContentType="application/json" \
+        --body '{
+            "properties": {
+                "workspaceId": "/subscriptions/$(yq eval '.parent_tenant.subscription_id' "$ROOT_VALUES")/resourceGroups/$(yq eval '.parent_tenant.la_resource_group' "$ROOT_VALUES")/providers/Microsoft.OperationalInsights/workspaces/$(yq eval '.parent_tenant.la_workspace' "$ROOT_VALUES")",
+                "storageAccountId": "/subscriptions/$(yq eval '.parent_tenant.subscription_id' "$ROOT_VALUES")/resourceGroups/$(yq eval '.parent_tenant.la_resource_group' "$ROOT_VALUES")/providers/Microsoft.Storage/storageAccounts/$(yq eval '.parent_tenant.la_storage_account' "$ROOT_VALUES")",
+                "logs": [
+                    {
+                        "category": "StorageRead",
+                        "enabled": true
+                    },
+                    {
+                        "category": "StorageWrite",
+                        "enabled": true
+                    },
+                    {
+                        "category": "StorageDelete",
+                        "enabled": true
+                    },
+                    {
+                        "categoryGroup": "allLogs",
+                        "enabled": true
+                    }
+                ]
+            }
+        }'
 echo "Setting up synapse workspace DiagnosticSettings"
 synapseUri="https://management.azure.com/subscriptions/$(yq eval '.client_tenant.subscription_id' "$ROOT_VALUES")/resourceGroups/$dataroom_resource_group/providers/Microsoft.Synapse/workspaces/$synapse_workspace_name/providers/Microsoft.Insights/diagnosticSettings/synapse?api-version=2021-05-01-preview"
-az rest --uri $synapseUri --method PUT --skip-authorization-header --headers Authorization="$primaryToken" x-ms-authorization-auxiliary="$auxToken" ContentType="application/json" --body "{\"properties\": {\"workspaceId\": \"/subscriptions/$(yq eval '.parent_tenant.subscription_id' "$ROOT_VALUES")/resourceGroups/$(yq eval '.parent_tenant.la_resource_group' "$ROOT_VALUES")/providers/Microsoft.OperationalInsights/workspaces/$(yq eval '.parent_tenant.la_workspace' "$ROOT_VALUES")\",\"logs\": [{\"categoryGroup\": \"allLogs\",\"enabled\": true}]}}"
+az rest --uri $synapseUri \
+        --method PUT \
+        --skip-authorization-header \
+        --headers Authorization="$primaryToken" x-ms-authorization-auxiliary="$auxToken" ContentType="application/json" \
+        --body '{
+            "properties": {
+                "workspaceId": "/subscriptions/$(yq eval '.parent_tenant.subscription_id' "$ROOT_VALUES")/resourceGroups/$(yq eval '.parent_tenant.la_resource_group' "$ROOT_VALUES")/providers/Microsoft.OperationalInsights/workspaces/$(yq eval '.parent_tenant.la_workspace' "$ROOT_VALUES")",
+                "storageAccountId": "/subscriptions/$(yq eval '.parent_tenant.subscription_id' "$ROOT_VALUES")/resourceGroups/$(yq eval '.parent_tenant.la_resource_group' "$ROOT_VALUES")/providers/Microsoft.Storage/storageAccounts/$(yq eval '.parent_tenant.la_storage_account' "$ROOT_VALUES")",
+                "logs": [
+                    {
+                        "categoryGroup": "allLogs",
+                        "enabled": true
+                    }
+                ]
+            }
+        }'
 
 echo "Step 10: Show Credentials"
 az logout

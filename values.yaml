@@ -10,4 +10,5 @@ parent_tenant:
   subscription_id: "<contributor_subscription_id>"
   tenant_id: "<contributor_tenant_id>"
   la_resource_group: "<contributor_log_analytics_resource_group>"
+  la_storage_account: "<log_archival_storage_account>"
   la_workspace: "<contributor_log_analytics_workspace>"
