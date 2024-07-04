@@ -21,8 +21,8 @@ partner_private_container_id=$(yq eval '.partner_details.private_container_id' "
 
 
 terraform_output=$(cat terraform_output.json)
-first_party_users=($(echo "$terraform_output" | jq -r '.first_party_ad_users.value[] | .object_id'))
-partner_users=($(echo "$terraform_output" | jq -r '.partner_ad_users.value[] | .object_id'))
+first_party_users=("5da0c63d-0b57-42ba-8624-3e1b10f620e2" "f4794ad8-8594-47d4-b52d-daa3ee76d88f" "629b6b44-ecaa-4b63-ab32-cedee9226588" "8454a249-193b-4d91-8dda-36336f33086f" "3b1e4a69-d67d-4236-9f7d-5dc11aa21af0" "2a2d4390-6105-4247-b30f-b4124c0b4fd7" "c42cd331-1e18-4454-862f-f7f9c87e07a2")
+partner_users=()
 
 # Combine the two arrays into one array
 allUsers=("${first_party_users[@]}" "${partner_users[@]}")
