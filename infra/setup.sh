@@ -54,7 +54,6 @@ client_subscription_id=$(yq eval '.client_tenant.subscription_id' "$ROOT_VALUES"
 client_tenant_id=$(yq eval '.client_tenant.tenant_id' "$ROOT_VALUES")
 client_tenant_cid=$(yq eval '.client_tenant.client_id' "$ROOT_VALUES")
 client_tenant_secret=$(yq eval '.client_tenant.client_secret' "$ROOT_VALUES")
-
 parent_subscription_id=$(yq eval '.parent_tenant.subscription_id' "$ROOT_VALUES")
 parent_tenant_id=$(yq eval '.parent_tenant.tenant_id' "$ROOT_VALUES")
 parent_tenant_cid=$(yq eval '.parent_tenant.client_id' "$ROOT_VALUES")
