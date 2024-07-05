@@ -49,7 +49,19 @@ export TF_LOCATION="centralindia"
 export TF_STORAGE_ACCOUNT="tfstatephp"$clientname
 export TF_STORAGE_CONTAINER="statecontainer"
 
-az login --service-principal --username $(yq eval '.client_tenant.client_id' "$ROOT_VALUES") --password $(yq eval '.client_tenant.client_secret' "$ROOT_VALUES") --tenant $(yq eval '.client_tenant.tenant_id' "$ROOT_VALUES")
+
+client_subscription_id=$(yq eval '.client_tenant.subscription_id' "$ROOT_VALUES")
+client_tenant_id=$(yq eval '.client_tenant.tenant_id' "$ROOT_VALUES")
+client_tenant_cid=$(yq eval '.client_tenant.client_id' "$ROOT_VALUES")
+client_tenant_secret=$(yq eval '.client_tenant.client_secret' "$ROOT_VALUES")
+
+parent_subscription_id=$(yq eval '.parent_tenant.subscription_id' "$ROOT_VALUES")
+parent_tenant_id=$(yq eval '.parent_tenant.tenant_id' "$ROOT_VALUES")
+parent_tenant_cid=$(yq eval '.parent_tenant.client_id' "$ROOT_VALUES")
+parent_tenant_secret=$(yq eval '.parent_tenant.client_secret' "$ROOT_VALUES")
+
+
+az login --service-principal --username $client_tenant_cid --password $client_tenant_secret --tenant $client_tenant_id
 echo "Azure login successfull"
 
 echo "Register required resource providers for creation of storage accounts and insights"
@@ -66,7 +78,7 @@ az storage account create -n $TF_STORAGE_ACCOUNT -g $TF_RESOURCE_GROUP -l $TF_LO
 echo "Azure terraform storage account created"
 az storage container create -n $TF_STORAGE_CONTAINER --account-name $TF_STORAGE_ACCOUNT -g $TF_RESOURCE_GROUP
 echo "Azure storage container created"
-az role assignment create --assignee "$ARM_CLIENT_ID" --role "Storage Blob Data Owner" --scope "/subscriptions/$(yq eval '.client_tenant.subscription_id' "$ROOT_VALUES")/resourceGroups/$TF_RESOURCE_GROUP/providers/Microsoft.Storage/storageAccounts/$TF_STORAGE_ACCOUNT"
+az role assignment create --assignee "$ARM_CLIENT_ID" --role "Storage Blob Data Owner" --scope "/subscriptions/$client_subscription_id/resourceGroups/$TF_RESOURCE_GROUP/providers/Microsoft.Storage/storageAccounts/$TF_STORAGE_ACCOUNT"
 echo "Azure role assignment done"
 
 
@@ -80,17 +92,17 @@ echo "Step 6: Terraform Apply"
 terraform apply --auto-approve infratfplan
 
 echo "Step 7: Setup Role for mutitenant APP ID"
-az login --service-principal --username $(yq eval '.client_tenant.client_id' "$ROOT_VALUES") --password $(yq eval '.client_tenant.client_secret' "$ROOT_VALUES") --tenant $(yq eval '.client_tenant.tenant_id' "$ROOT_VALUES")
-az ad sp create --id $(yq eval '.parent_tenant.client_id' "$ROOT_VALUES") || echo "Role creation step done"
-az role assignment create --assignee "$(yq eval '.parent_tenant.client_id' "$ROOT_VALUES")" --role "Contributor" --scope "/subscriptions/$(yq eval '.client_tenant.subscription_id' "$ROOT_VALUES")"
+az login --service-principal --username $client_tenant_cid --password $client_tenant_secret --tenant $client_tenant_id
+az ad sp create --id $parent_tenant_cid || echo "Role creation step done"
+az role assignment create --assignee "$parent_tenant_cid" --role "Contributor" --scope "/subscriptions/$client_subscription_id"
 echo "Waiting for Role propagation...."
 sleep 60
 
 echo "Step 8: Login using multitenant to Client Tenant"
-az login --service-principal -u "$(yq eval '.parent_tenant.client_id' "$ROOT_VALUES")" -p "$(yq eval '.parent_tenant.client_secret' "$ROOT_VALUES")" --tenant "$(yq eval '.client_tenant.tenant_id' "$ROOT_VALUES")"
+az login --service-principal -u "$parent_tenant_cid" -p "$parent_tenant_secret" --tenant "$parent_tenant_id"
 
-primaryToken=$(az account get-access-token --tenant "$(yq eval '.client_tenant.tenant_id' "$ROOT_VALUES")" -o tsv --query accessToken)
-auxToken=$(az account get-access-token --tenant "$(yq eval '.parent_tenant.tenant_id' "$ROOT_VALUES")"  -o tsv --query accessToken)
+primaryToken=$(az account get-access-token --tenant "$client_tenant_id" -o tsv --query accessToken)
+auxToken=$(az account get-access-token --tenant "$parent_tenant_id"  -o tsv --query accessToken)
 
 primaryToken="Bearer $primaryToken"
 auxToken="Bearer $auxToken"
@@ -100,113 +112,37 @@ echo $auxToken
 
 echo "Step 9: Send Logs"
 DiagnosticSettings=$(yq eval '.client_tenant.client_name' "$ROOT_VALUES")
-uri="https://management.azure.com/subscriptions/$(yq eval '.client_tenant.subscription_id' "$ROOT_VALUES")/providers/Microsoft.Insights/diagnosticSettings/$DiagnosticSettings?api-version=2021-05-01-preview"
-az rest --uri $uri \
-        --method PUT \
-        --skip-authorization-header \
-        --headers Authorization="$primaryToken" x-ms-authorization-auxiliary="$auxToken" ContentType="application/json" \
-        --body '{
-            "properties": {
-                "workspaceId": "/subscriptions/$(yq eval '.parent_tenant.subscription_id' "$ROOT_VALUES")/resourceGroups/$(yq eval '.parent_tenant.la_resource_group' "$ROOT_VALUES")/providers/Microsoft.OperationalInsights/workspaces/$(yq eval '.parent_tenant.la_workspace' "$ROOT_VALUES")",
-                "logs": [
-                    {
-                        "categoryGroup": "allLogs",
-                        "enabled": true
-                    }
-                ]
-            }
-        }'
+clientSubscriptionResourceId="/subscriptions/$client_subscription_id"
+la_resource_group=$(yq eval '.parent_tenant.la_resource_group' "$ROOT_VALUES")
+la_storage_account=$(yq eval '.parent_tenant.la_storage_account' "$ROOT_VALUES")
+la_workspace=$(yq eval '.parent_tenant.la_workspace' "$ROOT_VALUES")
 
-
-echo "Fetching SFTP Storage Account and dataroom resource group"
-first_party_account_name=$(terraform output storage_account_first_party_name | sed 's/"//g')
-partner_account_name=$(terraform output storage_account_partner_name | sed 's/"//g')
-
+la_storage_account_id="/subscriptions/$parent_subscription_id/resourceGroups/$la_resource_group/providers/Microsoft.Storage/storageAccounts/$la_storage_account"
+la_workspace_id="/subscriptions/$parent_subscription_id/resourceGroups/$la_resource_group/providers/Microsoft.OperationalInsights/workspaces/$la_workspace"
+first_party_account_id=$(terraform output storage_account_first_party_id | sed 's/"//g')
+partner_account_id=$(terraform output storage_account_partner_id | sed 's/"//g')
 dataroom_resource_group=$(terraform output resource_group_name | sed 's/"//g')
-synapse_workspace_name=$(terraform output synapse_workspace_name | sed 's/"//g')
+synapse_workspace_id=$(terraform output synapse_workspace_id | sed 's/"//g')
+
+
+uri="https://management.azure.com/subscriptions/$client_subscription_id/providers/Microsoft.Insights/diagnosticSettings/$DiagnosticSettings?api-version=2021-05-01-preview"
+az rest --uri $uri --method PUT --skip-authorization-header --headers Authorization="$primaryToken" x-ms-authorization-auxiliary="$auxToken" ContentType="application/json" --body "{\"properties\": {\"workspaceId\": \"$la_workspace_id\", \"storageAccountId\": \"$la_storage_account_id\", \"logs\": [{\"categoryGroup\": \"allLogs\",\"enabled\": true}]}}"
 
 echo "Setting up StorageBlob DiagnosticSettings for entities"
-firstPartyStorageBlobUri="https://management.azure.com/subscriptions/$(yq eval '.client_tenant.subscription_id' "$ROOT_VALUES")/resourceGroups/$dataroom_resource_group/providers/Microsoft.Storage/storageAccounts/$first_party_account_name/blobServices/default/providers/Microsoft.Insights/diagnosticSettings/storagebloblevel?api-version=2021-05-01-preview"
-az rest --uri $firstPartyStorageBlobUri \
-        --method PUT \
-        --skip-authorization-header \
-        --headers Authorization="$primaryToken" x-ms-authorization-auxiliary="$auxToken" ContentType="application/json" \
-        --body '{
-            "properties": {
-                "workspaceId": "/subscriptions/$(yq eval '.parent_tenant.subscription_id' "$ROOT_VALUES")/resourceGroups/$(yq eval '.parent_tenant.la_resource_group' "$ROOT_VALUES")/providers/Microsoft.OperationalInsights/workspaces/$(yq eval '.parent_tenant.la_workspace' "$ROOT_VALUES")",
-                "storageAccountId": "/subscriptions/$(yq eval '.parent_tenant.subscription_id' "$ROOT_VALUES")/resourceGroups/$(yq eval '.parent_tenant.la_resource_group' "$ROOT_VALUES")/providers/Microsoft.Storage/storageAccounts/$(yq eval '.parent_tenant.la_storage_account' "$ROOT_VALUES")"
-                "logs": [
-                    {
-                        "category": "StorageRead",
-                        "enabled": true
-                    },
-                    {
-                        "category": "StorageWrite",
-                        "enabled": true
-                    },
-                    {
-                        "category": "StorageDelete",
-                        "enabled": true
-                    },
-                    {
-                        "categoryGroup": "allLogs",
-                        "enabled": true
-                    }
-                ]
-            }
-        }'
+firstPartyStorageBlobUri="https://management.azure.com$first_party_account_id/blobServices/default/providers/Microsoft.Insights/diagnosticSettings/storagebloblevel?api-version=2021-05-01-preview"
+az rest --uri $firstPartyStorageBlobUri --method PUT --skip-authorization-header --headers Authorization="$primaryToken" x-ms-authorization-auxiliary="$auxToken" ContentType="application/json" --body "{\"properties\": {\"workspaceId\": \"$la_workspace_id\", \"storageAccountId\": \"$la_storage_account_id\", \"logs\": [{\"category\": \"StorageRead\",\"enabled\": true}, {\"category\": \"StorageWrite\",\"enabled\": true}, {\"category\": \"StorageDelete\",\"enabled\": true}]}}"
 
-partnerStorageBlobUri="https://management.azure.com/subscriptions/$(yq eval '.client_tenant.subscription_id' "$ROOT_VALUES")/resourceGroups/$dataroom_resource_group/providers/Microsoft.Storage/storageAccounts/$partner_account_name/blobServices/default/providers/Microsoft.Insights/diagnosticSettings/storagebloblevel?api-version=2021-05-01-preview"
-az rest --uri $partnerStorageBlobUri \
-        --method PUT \
-        --skip-authorization-header \
-        --headers Authorization="$primaryToken" x-ms-authorization-auxiliary="$auxToken" ContentType="application/json" \
-        --body '{
-            "properties": {
-                "workspaceId": "/subscriptions/$(yq eval '.parent_tenant.subscription_id' "$ROOT_VALUES")/resourceGroups/$(yq eval '.parent_tenant.la_resource_group' "$ROOT_VALUES")/providers/Microsoft.OperationalInsights/workspaces/$(yq eval '.parent_tenant.la_workspace' "$ROOT_VALUES")",
-                "storageAccountId": "/subscriptions/$(yq eval '.parent_tenant.subscription_id' "$ROOT_VALUES")/resourceGroups/$(yq eval '.parent_tenant.la_resource_group' "$ROOT_VALUES")/providers/Microsoft.Storage/storageAccounts/$(yq eval '.parent_tenant.la_storage_account' "$ROOT_VALUES")",
-                "logs": [
-                    {
-                        "category": "StorageRead",
-                        "enabled": true
-                    },
-                    {
-                        "category": "StorageWrite",
-                        "enabled": true
-                    },
-                    {
-                        "category": "StorageDelete",
-                        "enabled": true
-                    },
-                    {
-                        "categoryGroup": "allLogs",
-                        "enabled": true
-                    }
-                ]
-            }
-        }'
+partnerStorageBlobUri="https://management.azure.com$partner_account_id/blobServices/default/providers/Microsoft.Insights/diagnosticSettings/storagebloblevel?api-version=2021-05-01-preview"
+az rest --uri $partnerStorageBlobUri --method PUT --skip-authorization-header --headers Authorization="$primaryToken" x-ms-authorization-auxiliary="$auxToken" ContentType="application/json" --body "{\"properties\": {\"workspaceId\": \"$la_workspace_id\", \"storageAccountId\": \"$la_storage_account_id\", \"logs\": [{\"category\": \"StorageRead\",\"enabled\": true}, {\"category\": \"StorageWrite\",\"enabled\": true}, {\"category\": \"StorageDelete\",\"enabled\": true}]}}"
+
 echo "Setting up synapse workspace DiagnosticSettings"
-synapseUri="https://management.azure.com/subscriptions/$(yq eval '.client_tenant.subscription_id' "$ROOT_VALUES")/resourceGroups/$dataroom_resource_group/providers/Microsoft.Synapse/workspaces/$synapse_workspace_name/providers/Microsoft.Insights/diagnosticSettings/synapse?api-version=2021-05-01-preview"
-az rest --uri $synapseUri \
-        --method PUT \
-        --skip-authorization-header \
-        --headers Authorization="$primaryToken" x-ms-authorization-auxiliary="$auxToken" ContentType="application/json" \
-        --body '{
-            "properties": {
-                "workspaceId": "/subscriptions/$(yq eval '.parent_tenant.subscription_id' "$ROOT_VALUES")/resourceGroups/$(yq eval '.parent_tenant.la_resource_group' "$ROOT_VALUES")/providers/Microsoft.OperationalInsights/workspaces/$(yq eval '.parent_tenant.la_workspace' "$ROOT_VALUES")",
-                "storageAccountId": "/subscriptions/$(yq eval '.parent_tenant.subscription_id' "$ROOT_VALUES")/resourceGroups/$(yq eval '.parent_tenant.la_resource_group' "$ROOT_VALUES")/providers/Microsoft.Storage/storageAccounts/$(yq eval '.parent_tenant.la_storage_account' "$ROOT_VALUES")",
-                "logs": [
-                    {
-                        "categoryGroup": "allLogs",
-                        "enabled": true
-                    }
-                ]
-            }
-        }'
+synapseUri="https://management.azure.com$la_workspace_id/providers/Microsoft.Insights/diagnosticSettings/synapse?api-version=2021-05-01-preview"
+az rest --uri $synapseUri --method PUT --skip-authorization-header --headers Authorization="$primaryToken" x-ms-authorization-auxiliary="$auxToken" ContentType="application/json" --body "{\"properties\": {\"workspaceId\": \"$la_workspace_id\", \"storageAccountId\": \"$la_storage_account_id\", \"logs\": [{\"categoryGroup\": \"allLogs\",\"enabled\": true}]}}"
+
 
 echo "Step 10: Show Credentials"
 az logout
-az login --service-principal --username $(yq eval '.client_tenant.client_id' "$ROOT_VALUES") --password $(yq eval '.client_tenant.client_secret' "$ROOT_VALUES") --tenant $(yq eval '.client_tenant.tenant_id' "$ROOT_VALUES")
+az login --service-principal --username $client_tenant_cid --password $client_tenant_secret --tenant $client_tenant_id
 keyvault=$(terraform output users_keyvault_name | sed 's/"//g')
 echo "SQL Users"
 sqlusers=$(yq eval '.sql_administrator_login' "$LOCAL_VALUES")
