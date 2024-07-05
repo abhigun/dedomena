@@ -14,9 +14,9 @@
 locals {
   details = yamldecode(file("${path.module}/values.yaml"))
   first_party_details = local.details.first_party_details
-  first_party_users = local.first_party_details.users
+  first_party_users = length(local.first_party_details.users) > 0 ? local.first_party_details.users : {}
   partner_details = local.details.partner_details
-  partner_users = local.partner_details.users
+  partner_users = length(local.partner_details.users) > 0 ? local.partner_details.users : {}
 }
 
 # Loop through first party users

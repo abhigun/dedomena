@@ -1,8 +1,8 @@
 locals {
   details = yamldecode(file("${path.module}/values.yaml"))
-  # users = local.details.users
-  first_party_users = local.details.first_party_details.users
-  partner_users = local.details.partner_details.users
+  first_party_users = length(local.details.first_party_details.users) > 0 ? local.details.first_party_details.users : {}
+  partner_users = length(local.details.partner_details.users) > 0 ? local.details.partner_details.users : {}
+
 }
 
 module "first_party_ad_users" {
