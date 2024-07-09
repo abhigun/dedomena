@@ -13,44 +13,118 @@
 */
 locals {
   details = yamldecode(file("${path.module}/values.yaml"))
+  first_party_details = local.details.first_party_details
+  first_party_users = length(local.first_party_details.users) > 0 ? local.first_party_details.users : {}
+  partner_details = local.details.partner_details
+  partner_users = length(local.partner_details.users) > 0 ? local.partner_details.users : {}
 }
 
-module "storage_container" {
-  source                = "../modules/services/storage_container"
-  name                  = local.details.container_name
-  storage_account_name  = local.details.storage_account_name
-  container_access_type = "blob"
-}
-
-module "local_user" {
+# Loop through first party users
+module "first_party_private_sftp_users" {
   source = "../modules/services/storage_account_local_user"
-  local_user = local.details.local_user_name
-  resource_name = module.storage_container.storage_container_name
-  storage_account_id = local.details.storage_account_id
-}
-
-# Workaround until azurerm_storage_account supports isSftpEnabled property
-# see https://github.com/hashicorp/terraform-provider-azurerm/issues/14736
-resource "azapi_update_resource" "enable_sftp" {
-  type        = "Microsoft.Storage/storageAccounts@2023-01-01"
-  resource_id = local.details.storage_account_id
-
-  body = jsonencode({
-    properties = {
-      isSftpEnabled = true
+  for_each = { for user in local.first_party_users : user => user }
+  storage_account_id = local.first_party_details.account_id
+  local_user = each.key
+  containers = [
+    {
+      container_name = local.first_party_details.private_container_name
+      user_access    = "rwd"
+    },
+    {
+      container_name = local.first_party_details.public_container_name
+      user_access    = "rwd"
     }
-  })
+  ]
 }
 
-resource "azapi_resource_action" "sftpPassword" {
+# Loop through partner users
+module "partner_sftp_private_users" {
+  source = "../modules/services/storage_account_local_user"
+  for_each = { for user in local.partner_users : user => user }
+  storage_account_id = local.partner_details.account_id
+  local_user = each.key
+  containers = [
+    {
+      container_name = local.partner_details.private_container_name
+      user_access    = "rwd"
+    },
+    {
+      container_name = local.partner_details.public_container_name
+      user_access    = "rwd"
+    }
+  ]
+}
+
+# Generate passwords for first party users
+resource "azapi_resource_action" "first_party_private_passwords" {
+  for_each = { for user in local.first_party_users : user => user }
+
   type = "Microsoft.Storage/storageAccounts/localUsers@2023-01-01"
-  resource_id = module.local_user.id
+  resource_id = module.first_party_private_sftp_users[each.key].id
   action = "regeneratePassword"
   body = jsonencode({
-  username = local.details.local_user_name
+    username = each.key
   })
 
   response_export_values = ["sshPassword"]
 }
 
+# Generate passwords for partner users
+resource "azapi_resource_action" "partner_private_passwords" {
+  for_each = { for user in local.partner_users : user => user }
 
+  type = "Microsoft.Storage/storageAccounts/localUsers@2023-01-01"
+  resource_id = module.partner_sftp_private_users[each.key].id
+  action = "regeneratePassword"
+  body = jsonencode({
+    username = each.key
+  })
+
+  response_export_values = ["sshPassword"]
+}
+
+module "first_party_sftp_public_user" {
+  source = "../modules/services/storage_account_local_user"
+  local_user = local.first_party_details.public_user
+  storage_account_id = local.first_party_details.account_id
+  containers = [
+    {
+      container_name = local.first_party_details.public_container_name
+      user_access = "ro"
+    }
+  ]
+}
+
+module "partner_sftp_public_user" {
+  source = "../modules/services/storage_account_local_user"
+  local_user = local.partner_details.public_user
+  storage_account_id = local.partner_details.account_id
+  containers = [
+    {
+      container_name = local.partner_details.public_container_name
+      user_access = "ro"
+    }
+  ]  
+}
+
+resource "azapi_resource_action" "first_party_public_password" {
+  type = "Microsoft.Storage/storageAccounts/localUsers@2023-01-01"
+  resource_id = module.first_party_sftp_public_user.id
+  action = "regeneratePassword"
+  body = jsonencode({
+  username = local.first_party_details.public_user
+  })
+
+  response_export_values = ["sshPassword"]
+}
+
+resource "azapi_resource_action" "partner_public_password" {
+  type = "Microsoft.Storage/storageAccounts/localUsers@2023-01-01"
+  resource_id = module.partner_sftp_public_user.id
+  action = "regeneratePassword"
+  body = jsonencode({
+  username = local.partner_details.public_user
+  })
+
+  response_export_values = ["sshPassword"]
+}

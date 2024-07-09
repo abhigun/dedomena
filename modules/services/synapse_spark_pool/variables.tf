@@ -12,9 +12,11 @@
   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 */
 variable "name" {}
-variable "storage_account_id" {}
+variable "storage_account_name" {}
 variable "resource_group_name" {}
 variable "location" {}
+variable "account_tier" {}
+variable "account_replication_type" {}
 
 variable "sql_administrator_login" {}
 variable "key_vault_id" {}

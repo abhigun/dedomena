@@ -28,9 +28,20 @@ module "kv_secret" {
   key_vault_id = var.key_vault_id
 }
 
+module "storage_account_synapse" {
+  source                   = "../storage_account"
+  name                     = var.storage_account_name
+  resource_group_name      = var.resource_group_name
+  location                 = var.location
+  account_tier             = var.account_tier
+  account_replication_type = var.account_replication_type
+  is_hns_enabled           = true
+  sftp_enabled             = true
+}
+
 resource "azurerm_storage_data_lake_gen2_filesystem" "fs" {
   name               = var.name
-  storage_account_id = var.storage_account_id
+  storage_account_id = module.storage_account_synapse.storage_account_id
 }
 
 resource "azurerm_synapse_workspace" "sw" {
@@ -49,8 +60,8 @@ resource "azurerm_synapse_workspace" "sw" {
 resource "azurerm_synapse_firewall_rule" "synapsefirewall" {
   name                 = "AllowAll"
   synapse_workspace_id = azurerm_synapse_workspace.sw.id
-  start_ip_address     = "106.222.200.87"
-  end_ip_address       = "106.222.200.87"
+  start_ip_address     = "0.0.0.0"
+  end_ip_address       = "255.255.255.255"
 }
 
 
@@ -62,6 +73,7 @@ resource "azurerm_synapse_spark_pool" "ssp" {
   node_size_family     = "MemoryOptimized"
   node_size            = "Small"
   cache_size           = 100
+  spark_version        = 3.3
 
   auto_scale {
     max_node_count = 50
@@ -88,6 +100,6 @@ EOF
   }
 
   tags = {
-    ENV = "Dev"
+    ENV = "Production"
   }
 }
