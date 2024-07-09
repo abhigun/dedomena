@@ -57,7 +57,7 @@ for containerId in "$first_party_public_container_id" "$first_party_private_cont
 done
 
 for containerId in "$partner_public_container_id" "$partner_private_container_id"; do
-    for userObjectId in "${partnerUsers[@]}"; do
+    for userObjectId in "${partner_users[@]}"; do
         az role assignment create --role "Storage Blob Data Contributor" --assignee-object-id $userObjectId --scope $containerId
     done
 done
@@ -69,7 +69,7 @@ for userObjectId in "${allUsers[@]}"; do
 done
 
 # Assign Storage Contributor role to all the users for Synapse container
-for userObjectId in "${userObjectIds[@]}"; do
+for userObjectId in "${allUsers[@]}"; do
     az role assignment create --role "Storage Blob Data Contributor" --assignee-object-id $userObjectId --scope $synapseStorageContainerId
 done
 

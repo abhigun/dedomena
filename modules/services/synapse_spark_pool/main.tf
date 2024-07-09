@@ -88,6 +88,7 @@ resource "azurerm_synapse_spark_pool" "ssp" {
     content  = <<EOF
 appnope==0.1.0
 beautifulsoup4==4.6.3
+pycryptodome==3.2.0
 EOF
     filename = "requirements.txt"
   }
